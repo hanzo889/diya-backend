@@ -5,6 +5,8 @@ import (
 	bukuhub "library/app/service/buku_hub"
 	"library/app/service/denda"
 	hargabuku "library/app/service/harga_buku"
+	listkondisi "library/app/service/list_kondisi"
+	"library/app/service/rak"
 	"library/database"
 
 	"github.com/gin-gonic/gin"
@@ -21,6 +23,7 @@ func Run() {
 	bukuhub.Router(api,db)
 	denda.Router(api,db)
 	hargabuku.Router(api,db)
-
+	rak.Router(api,db)
+	listkondisi.Router(api,db)
 	router.Run()
 }

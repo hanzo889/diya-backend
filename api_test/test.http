@@ -36,3 +36,7 @@ DELETE {{host}}/api/buku-hub/1
 GET {{host}}/api/denda
 ###
 GET {{host}}/api/harga-buku
+###
+GET {{host}}/api/list-kondisi
+###
+GET {{host}}/api/rak

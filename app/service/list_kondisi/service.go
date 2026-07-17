@@ -6,26 +6,26 @@ import (
 )
 
 type ListKondisi interface {
-	Get() []model.ListKondisi
-	CreateListKondisi(kondisi string)
-	Update(list_kodisi model.ListKondisi)
+	Get() []reponseListKondisi
+	CreateListKondisi(kondisiR CreateRequest)
+	Update(kondisiR *CreateRequest,id int)
 	Delete(id int)
-	GetById(id int) *model.ListKondisi
+	GetById(id int) *reponseListKondisi
 }
 
 type ListKondisiService struct {
 	repo Repository
 }
 
-var data []model.ListKondisi
+
 
 func NewService(repo Repository) ListKondisi {
 	return &ListKondisiService{repo}
 }
 
-func (b *ListKondisiService) CreateListKondisi(kondisi string) {
+func (b *ListKondisiService) CreateListKondisi(kondisR CreateRequest) {
 	listkondisi := &model.ListKondisi{
-		Kondisi: kondisi,
+		Kondisi: kondisR.Kondisi,
 	}
 	err := b.repo.Create(listkondisi)
 	if err != nil {
@@ -33,8 +33,8 @@ func (b *ListKondisiService) CreateListKondisi(kondisi string) {
 	}
 
 }
-func (b *ListKondisiService) Get() []model.ListKondisi {
-	var kondisikondisi []model.ListKondisi
+func (b *ListKondisiService) Get() []reponseListKondisi {
+	var kondisikondisi []reponseListKondisi
 	kondisikondisiRepo, err := b.repo.GetAll()
 
 	if err != nil {
@@ -44,7 +44,7 @@ func (b *ListKondisiService) Get() []model.ListKondisi {
 	// log.Println(kondisikondisiRepo)
 	for kondisikondisiRepo.Next() {
 
-		var kondisi model.ListKondisi
+		var kondisi reponseListKondisi
 		if err := kondisikondisiRepo.Scan(&kondisi.Id, &kondisi.Kondisi); err != nil {
 			return kondisikondisi
 		}
@@ -53,8 +53,12 @@ func (b *ListKondisiService) Get() []model.ListKondisi {
 	return kondisikondisi
 }
 
-func (b *ListKondisiService) Update(list_kodisi model.ListKondisi) {
-	err := b.repo.Update(&list_kodisi)
+func (b *ListKondisiService) Update(kondisiR *CreateRequest,id int) {
+	kondisi:=&model.ListKondisi{
+		Id: id,
+		Kondisi: kondisiR.Kondisi,
+	}
+	err := b.repo.Update(kondisi)
 	if err != nil {
 		log.Println(err)
 	}
@@ -66,10 +70,10 @@ func (b *ListKondisiService) Delete(id int) {
 	}
 }
 
-func (b ListKondisiService) GetById(id int) *model.ListKondisi {
+func (b ListKondisiService) GetById(id int) *reponseListKondisi {
 	bariskondisi := b.repo.GetById(id)
 
-	var kondisi model.ListKondisi
+	var kondisi reponseListKondisi
 	if err := bariskondisi.Scan(&kondisi.Id, kondisi.Kondisi); err != nil {
 		log.Println(err)
 	}
