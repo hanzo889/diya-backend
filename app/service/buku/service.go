@@ -1,33 +1,32 @@
 package buku
 
 import (
-	"library/model"
+	"library/app/model"
 	"log"
 )
 
 type Buku interface {
-	Get() []model.Buku
-	CreateBuku(judul string, listKategoriId int, stock int)
-	Update(buku model.Buku)
+	Get() []ResponseBuku
+	CreateBuku(bukuRequest CreateRequest)
+	Update(bukuRequest *CreateRequest, id int)
 	Delete(id int)
-	GetById(id int) *model.Buku
+	GetById(id int) *ResponseBuku
 }
 
 type bukuService struct {
 	repo Repository
 }
 
-var data []model.Buku
-
 func NewService(repo Repository) Buku {
 	return &bukuService{repo}
 }
 
-func (b *bukuService) CreateBuku(judul string, listKategoriId int, stock int) {
+func (b *bukuService) CreateBuku(bukuRequest CreateRequest) {
+
 	buku := &model.Buku{
-		Judul:          judul,
-		ListKategoriId: listKategoriId,
-		Stock:          stock,
+		Judul:          bukuRequest.Judul,
+		ListKategoriId: bukuRequest.ListKategoriId,
+		Stock:          bukuRequest.Stock,
 	}
 	err := b.repo.Create(buku)
 	if err != nil {
@@ -35,8 +34,8 @@ func (b *bukuService) CreateBuku(judul string, listKategoriId int, stock int) {
 	}
 
 }
-func (b *bukuService) Get() []model.Buku {
-	var bukuBuku []model.Buku
+func (b *bukuService) Get() []ResponseBuku {
+	var bukuBuku []ResponseBuku
 	bukuBukuRepo, err := b.repo.GetAll()
 
 	if err != nil {
@@ -46,17 +45,24 @@ func (b *bukuService) Get() []model.Buku {
 	// log.Println(bukuBukuRepo)
 	for bukuBukuRepo.Next() {
 
-		var buku model.Buku
+		var buku ResponseBuku
 		if err := bukuBukuRepo.Scan(&buku.Id, &buku.Judul, &buku.ListKategoriId, &buku.Stock); err != nil {
 			return bukuBuku
 		}
 		bukuBuku = append(bukuBuku, buku)
 	}
+
 	return bukuBuku
 }
 
-func (b *bukuService) Update(buku model.Buku) {
-	err := b.repo.Update(&buku)
+func (b *bukuService) Update(bukuRequest *CreateRequest, id int) {
+	buku := &model.Buku{
+		Id:             id,
+		Judul:          bukuRequest.Judul,
+		ListKategoriId: bukuRequest.ListKategoriId,
+		Stock:          bukuRequest.Stock,
+	}
+	err := b.repo.Update(buku)
 	if err != nil {
 		log.Println(err)
 	}
@@ -68,10 +74,10 @@ func (b *bukuService) Delete(id int) {
 	}
 }
 
-func (b *bukuService) GetById(id int) *model.Buku {
+func (b *bukuService) GetById(id int) *ResponseBuku {
 	barisBuku := b.repo.GetById(id)
 
-	var buku model.Buku
+	var buku ResponseBuku
 	if err := barisBuku.Scan(&buku.Id, &buku.Judul, &buku.ListKategoriId, &buku.Stock); err != nil {
 		log.Println(err)
 	}

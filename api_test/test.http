@@ -1,0 +1,28 @@
+@host=http://localhost:8080
+
+
+GET {{host}}/
+###
+GET {{host}}/api/buku
+###
+GET {{host}}/api/buku/5
+###
+DELETE {{host}}/api/buku/6
+###
+POST {{host}}/api/buku
+Content-Type: application/json
+
+{
+    "judul":"bumi",
+    "list_kategori_id":2,
+    "stock":400
+}
+###
+PUT {{host}}/api/buku/8
+Content-Type: application/json
+
+{
+    "judul":"bulan",
+    "list_kategori_id":2,
+    "stock":400
+}
