@@ -6,11 +6,11 @@ import (
 )
 
 type HargaBuku interface {
-	Get() []model.HargaBuku
-	CreateHargaBuku(bukuID int, HargaB int)
-	Update(hargaB model.HargaBuku)
+	Get() []responseHargaBuku
+	CreateHargaBuku(hbr CreateRequest)
+	Update(hbr *CreateRequest, id int)
 	Delete(id int)
-	GetById(id int) *model.HargaBuku
+	GetById(id int) *responseHargaBuku
 }
 
 type HargaBukuService struct {
@@ -23,10 +23,10 @@ func NewService(repo Repository) HargaBuku {
 	return &HargaBukuService{repo}
 }
 
-func (b *HargaBukuService) CreateHargaBuku(bukuID int, hargaB int) {
+func (b *HargaBukuService) CreateHargaBuku(hbr CreateRequest) {
 	hargaBuku := &model.HargaBuku{
-		BukuId: bukuID,
-		Harga:  hargaB,
+		BukuId: hbr.BukuId,
+		Harga:  hbr.Harga,
 	}
 	err := b.repo.CreateHargaBuku(hargaBuku)
 	if err != nil {
@@ -34,8 +34,8 @@ func (b *HargaBukuService) CreateHargaBuku(bukuID int, hargaB int) {
 	}
 
 }
-func (b *HargaBukuService) Get() []model.HargaBuku {
-	var hargaharga []model.HargaBuku
+func (b *HargaBukuService) Get() []responseHargaBuku {
+	var hargaharga []responseHargaBuku
 	hargahargaRepo, err := b.repo.GetAll()
 
 	if err != nil {
@@ -45,7 +45,7 @@ func (b *HargaBukuService) Get() []model.HargaBuku {
 	// log.Println(hargahargaRepo)
 	for hargahargaRepo.Next() {
 
-		var hargaBuku model.HargaBuku
+		var hargaBuku responseHargaBuku
 		if err := hargahargaRepo.Scan(&hargaBuku.Id, &hargaBuku.BukuId, &hargaBuku.Harga); err != nil {
 			return hargaharga
 		}
@@ -54,8 +54,14 @@ func (b *HargaBukuService) Get() []model.HargaBuku {
 	return hargaharga
 }
 
-func (b *HargaBukuService) Update(hargaB model.HargaBuku) {
-	err := b.repo.Update(&hargaB)
+func (b *HargaBukuService) Update(hbr *CreateRequest, id int) {
+	hargaB := &model.HargaBuku{
+		Id: id,
+		BukuId: hbr.BukuId,
+		Harga:  hbr.Harga,
+	}
+
+	err := b.repo.Update(hargaB)
 	if err != nil {
 		log.Println(err)
 	}
@@ -67,10 +73,10 @@ func (b *HargaBukuService) Delete(id int) {
 	}
 }
 
-func (b HargaBukuService) GetById(id int) *model.HargaBuku {
+func (b HargaBukuService) GetById(id int) *responseHargaBuku {
 	bariskondisi := b.repo.GetById(id)
 
-	var hargaBuku model.HargaBuku
+	var hargaBuku responseHargaBuku
 	if err := bariskondisi.Scan(&hargaBuku.Id, &hargaBuku.BukuId, &hargaBuku.Harga); err != nil {
 		log.Println(err)
 	}

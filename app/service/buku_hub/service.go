@@ -6,11 +6,11 @@ import (
 )
 
 type BukuHub interface {
-	Get() []model.BukuHub
-	CreateBukuHub(barcode int, buku_id int, list_kondisi_id int, anggota_id int, rak_id int)
-	Update(bukuhub model.BukuHub)
+	Get() []responseBukuHub
+	CreateBukuHub(bukuHubRequest CreateRequest)
+	Update(bukuRequest *CreateRequest, id int)
 	Delete(id int)
-	GetById(id int) *model.BukuHub
+	GetById(id int) *responseBukuHub
 }
 
 type bukuHubService struct {
@@ -23,16 +23,22 @@ func NewService(repo Repository) BukuHub {
 	return &bukuHubService{repo}
 }
 
-func (b *bukuHubService) CreateBukuHub(barcode int, buku_id int, list_kondisi_id int, anggota_id int, rak_id int) {
-	bukuhub := &model.BukuHub{}
+func (b *bukuHubService) CreateBukuHub(bukuHubRequest CreateRequest) {
+	bukuhub := &model.BukuHub{
+		Barcode:       bukuHubRequest.Barcode,
+		BukuId:        bukuHubRequest.ListKondisiId,
+		ListKondisiId: bukuHubRequest.ListKondisiId,
+		AnggotaId:     bukuHubRequest.AnggotaId,
+		RakId:         bukuHubRequest.RakId,
+	}
 	err := b.repo.Create(bukuhub)
 	if err != nil {
 		log.Println(err)
 	}
 
 }
-func (b *bukuHubService) Get() []model.BukuHub {
-	var bukuBukuHub []model.BukuHub
+func (b *bukuHubService) Get() []responseBukuHub {
+	var bukuBukuHub []responseBukuHub
 	bukuBukuHubRepo, err := b.repo.GetAll()
 
 	if err != nil {
@@ -42,8 +48,8 @@ func (b *bukuHubService) Get() []model.BukuHub {
 	// log.Println(bukuBukuHubRepo)
 	for bukuBukuHubRepo.Next() {
 
-		var bukuhub model.BukuHub
-		if err := bukuBukuHubRepo.Scan(&bukuhub.ID, &bukuhub.Barcode, &bukuhub.BukuId, &bukuhub.ListKondisiId, &bukuhub.AnggotaId, &bukuhub.RakId); err != nil {
+		var bukuhub responseBukuHub
+		if err := bukuBukuHubRepo.Scan(&bukuhub.Id, &bukuhub.Barcode, &bukuhub.BukuId, &bukuhub.ListKondisiId, &bukuhub.AnggotaId, &bukuhub.RakId); err != nil {
 			return bukuBukuHub
 		}
 		bukuBukuHub = append(bukuBukuHub, bukuhub)
@@ -51,8 +57,16 @@ func (b *bukuHubService) Get() []model.BukuHub {
 	return bukuBukuHub
 }
 
-func (b *bukuHubService) Update(buku model.BukuHub) {
-	err := b.repo.Update(&buku)
+func (b *bukuHubService) Update(bukuHubRequest *CreateRequest, id int) {
+	bukuhub := &model.BukuHub{
+		ID:            bukuHubRequest.BukuId,
+		Barcode:       bukuHubRequest.Barcode,
+		BukuId:        bukuHubRequest.ListKondisiId,
+		ListKondisiId: bukuHubRequest.ListKondisiId,
+		AnggotaId:     bukuHubRequest.AnggotaId,
+		RakId:         bukuHubRequest.RakId,
+	}
+	err := b.repo.Update(bukuhub)
 	if err != nil {
 		log.Println(err)
 	}
@@ -64,11 +78,11 @@ func (b *bukuHubService) Delete(id int) {
 	}
 }
 
-func (b *bukuHubService) GetById(id int) *model.BukuHub {
+func (b *bukuHubService) GetById(id int) *responseBukuHub {
 	barisBukuHub := b.repo.GetById(id)
 
-	var bukuhub model.BukuHub
-	if err := barisBukuHub.Scan(&bukuhub.ID, &bukuhub.Barcode, &bukuhub.BukuId, &bukuhub.ListKondisiId, &bukuhub.AnggotaId, &bukuhub.RakId); err != nil {
+	var bukuhub responseBukuHub
+	if err := barisBukuHub.Scan(&bukuhub.Id, &bukuhub.Barcode, &bukuhub.BukuId, &bukuhub.ListKondisiId, &bukuhub.AnggotaId, &bukuhub.RakId); err != nil {
 		log.Println(err)
 	}
 	return &bukuhub

@@ -26,3 +26,13 @@ Content-Type: application/json
     "list_kategori_id":2,
     "stock":400
 }
+###
+GET {{host}}/api/buku-hub
+###
+GET {{host}}/api/buku-hub/2
+###
+DELETE {{host}}/api/buku-hub/1
+###
+GET {{host}}/api/denda
+###
+GET {{host}}/api/harga-buku
