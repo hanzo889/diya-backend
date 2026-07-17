@@ -1,6 +1,5 @@
 package bukuhub
 
-
 import (
 	"database/sql"
 	"strconv"
@@ -13,25 +12,25 @@ func Router(g *gin.RouterGroup, db *sql.DB) {
 
 	service := NewService(repo)
 
-	buku := g.Group("/buku-hub")
-	buku.GET("", func(ctx *gin.Context) {
+	hargaBuku := g.Group("/buku-hub")
+	hargaBuku.GET("", func(ctx *gin.Context) {
 		ctx.JSON(200, service.Get())
 	})
 
-	buku.GET("/:id", func(ctx *gin.Context) {
+	hargaBuku.GET("/:id", func(ctx *gin.Context) {
 
 		id, _ := strconv.Atoi(ctx.Param("id"))
 
 		ctx.JSON(200, service.GetById(id))
 
 	})
-	buku.DELETE("/:id", func(ctx *gin.Context) {
+	hargaBuku.DELETE("/:id", func(ctx *gin.Context) {
 		id, _ := strconv.Atoi(ctx.Param("id"))
 		service.Delete(id)
 		ctx.JSON(200, gin.H{"message": "success"})
 	})
 
-	buku.POST("", func(ctx *gin.Context) {
+	hargaBuku.POST("", func(ctx *gin.Context) {
 		var request *CreateRequest
 		err := ctx.BindJSON(&request)
 		if err != nil {
@@ -45,7 +44,7 @@ func Router(g *gin.RouterGroup, db *sql.DB) {
 
 	})
 
-	buku.PUT("/:id", func(ctx *gin.Context) {
+	hargaBuku.PUT("/:id", func(ctx *gin.Context) {
 		id, _ := strconv.Atoi(ctx.Param("id"))
 
 		var request *CreateRequest
@@ -53,8 +52,8 @@ func Router(g *gin.RouterGroup, db *sql.DB) {
 		if err != nil {
 			ctx.JSON(400, gin.H{"message": "error bree"})
 		}
-		
-		service.Update(request,id)
+
+		service.Update(request, id)
 	})
 
 }

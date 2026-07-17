@@ -59,9 +59,9 @@ func (b *bukuHubService) Get() []responseBukuHub {
 
 func (b *bukuHubService) Update(bukuHubRequest *CreateRequest, id int) {
 	bukuhub := &model.BukuHub{
-		ID:            bukuHubRequest.BukuId,
+		ID:            id,
 		Barcode:       bukuHubRequest.Barcode,
-		BukuId:        bukuHubRequest.ListKondisiId,
+		BukuId:        bukuHubRequest.BukuId,
 		ListKondisiId: bukuHubRequest.ListKondisiId,
 		AnggotaId:     bukuHubRequest.AnggotaId,
 		RakId:         bukuHubRequest.RakId,

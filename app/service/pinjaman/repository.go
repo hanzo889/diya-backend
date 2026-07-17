@@ -24,7 +24,7 @@ func NewRepository(db *sql.DB) Repository {
 }
 
 func (r *repository) Create(pinjaman *model.Pinjaman) error {
-	_, err := r.db.Exec("insert into pinjaman (anggota_id,buku_id,tgl_pinjam,tgl_balik,petugas_pinjam_id,list_kondisi_id,petugas_balik_id) values(?,?,?,?,?,?,?)", pinjaman.AnggotaId, pinjaman.BukuId, pinjaman.TglPinjam, pinjaman.TglBalik, pinjaman.PetugasPinjamId, pinjaman.ListKondisiId, pinjaman.PetuagasBalikId)
+	_, err := r.db.Exec("insert into pinjaman (anggota_id,buku_id,tgl_pinjam,tgl_balik,petugas_pinjam_id,list_kondisi_id,petugas_balik_id) values(?,?,?,?,?,?,?)", pinjaman.AnggotaId, pinjaman.BukuId, pinjaman.TglPinjam, pinjaman.TglBalik, pinjaman.PetugasPinjamId, pinjaman.ListKondisiId, pinjaman.PetugasBalikId)
 	return err
 }
 
@@ -33,7 +33,7 @@ func (r *repository) GetAll() (*sql.Rows, error) {
 }
 
 func (r *repository) Update(pinjaman *model.Pinjaman) error {
-	_, err := r.db.Exec("update pinjaman set anggota_id=?,buku_id=?=?,tgl_pinjam=?,tgl_balik=?,petugas_pinjam_id=?,list_kondisi_id=?,petugas_balik_id=?  where id=?", pinjaman.AnggotaId, pinjaman.BukuId, pinjaman.TglPinjam, pinjaman.TglBalik, pinjaman.PetugasPinjamId, pinjaman.ListKondisiId, pinjaman.PetuagasBalikId, pinjaman.Id)
+	_, err := r.db.Exec("update pinjaman set anggota_id=?,buku_id=?=?,tgl_pinjam=?,tgl_balik=?,petugas_pinjam_id=?,list_kondisi_id=?,petugas_balik_id=?  where id=?", pinjaman.AnggotaId, pinjaman.BukuId, pinjaman.TglPinjam, pinjaman.TglBalik, pinjaman.PetugasPinjamId, pinjaman.ListKondisiId, pinjaman.PetugasBalikId, pinjaman.Id)
 	return err
 }
 

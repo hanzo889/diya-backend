@@ -10,5 +10,5 @@ type Pinjaman struct{
 	TglBalik time.Time
 	PetugasPinjamId int
 	ListKondisiId int
-	PetuagasBalikId int
+	PetugasBalikId int
 }

@@ -3,15 +3,14 @@ package pinjaman
 import (
 	"library/app/model"
 	"log"
-	"time"
 )
 
 type Pinjaman interface {
-	Get() []model.Pinjaman
-	CreatePinjaman(anggota_id int, buku_id int, tgl_pinjam time.Time, tgl_balik time.Time, petugas_pinjam_id int, list_kondisi_id int, petugas_balik_id int)
-	Update(pinjaman model.Pinjaman)
+	Get() []ResponsePinjaman
+	CreatePinjaman(pinjamanRequest CreateRequest)
+	Update(pinjamanRequest *CreateRequest, id int)
 	Delete(id int)
-	GetById(id int) *model.Pinjaman
+	GetById(id int) *ResponsePinjaman
 }
 
 type pinjamanService struct {
@@ -24,15 +23,15 @@ func NewService(repo Repository) Pinjaman {
 	return &pinjamanService{repo}
 }
 
-func (b *pinjamanService) CreatePinjaman(anggota_id int, buku_id int, tgl_pinjam time.Time, tgl_balik time.Time, petugas_pinjam_id int, list_kondisi_id int, petugas_balik_id int) {
+func (b *pinjamanService) CreatePinjaman(pinjamanRequest CreateRequest) {
 	pinjaman := &model.Pinjaman{
-		AnggotaId:       anggota_id,
-		BukuId:          buku_id,
-		TglPinjam:       tgl_pinjam,
-		TglBalik:        tgl_balik,
-		PetugasPinjamId: petugas_pinjam_id,
-		ListKondisiId:   list_kondisi_id,
-		PetuagasBalikId: petugas_balik_id,
+		AnggotaId:       pinjamanRequest.AnggotaId,
+		BukuId:          pinjamanRequest.BukuId,
+		TglPinjam:       pinjamanRequest.TglPinjam,
+		TglBalik:        pinjamanRequest.TglBalik,
+		PetugasPinjamId: pinjamanRequest.PetugasPinjamId,
+		ListKondisiId:   pinjamanRequest.ListKondisiId,
+		PetugasBalikId:  pinjamanRequest.PetugasBalikId,
 	}
 	err := b.repo.Create(pinjaman)
 	if err != nil {
@@ -40,8 +39,8 @@ func (b *pinjamanService) CreatePinjaman(anggota_id int, buku_id int, tgl_pinjam
 	}
 
 }
-func (b *pinjamanService) Get() []model.Pinjaman {
-	var pinjamanpinjaman []model.Pinjaman
+func (b *pinjamanService) Get() []ResponsePinjaman {
+	var pinjamanpinjaman []ResponsePinjaman
 	pinjamanpinjamanRepo, err := b.repo.GetAll()
 
 	if err != nil {
@@ -51,8 +50,8 @@ func (b *pinjamanService) Get() []model.Pinjaman {
 	// log.Println(pinjamanpinjamanRepo)
 	for pinjamanpinjamanRepo.Next() {
 
-		var pinjaman model.Pinjaman
-		if err := pinjamanpinjamanRepo.Scan(&pinjaman.Id, &pinjaman.AnggotaId, &pinjaman.BukuId, &pinjaman.TglPinjam, &pinjaman.TglBalik, &pinjaman.ListKondisiId, &pinjaman.ListKondisiId, &pinjaman.PetuagasBalikId); err != nil {
+		var pinjaman ResponsePinjaman
+		if err := pinjamanpinjamanRepo.Scan(&pinjaman.Id, &pinjaman.AnggotaId, &pinjaman.BukuId, &pinjaman.TglPinjam, &pinjaman.TglBalik, &pinjaman.ListKondisiId, &pinjaman.ListKondisiId, &pinjaman.PetugasBalikId); err != nil {
 			return pinjamanpinjaman
 		}
 		pinjamanpinjaman = append(pinjamanpinjaman, pinjaman)
@@ -60,8 +59,18 @@ func (b *pinjamanService) Get() []model.Pinjaman {
 	return pinjamanpinjaman
 }
 
-func (b *pinjamanService) Update(pinjaman model.Pinjaman) {
-	err := b.repo.Update(&pinjaman)
+func (b *pinjamanService) Update(pinjamanRequest *CreateRequest, id int) {
+	pinjaman := &model.Pinjaman{
+		Id:              id,
+		AnggotaId:       pinjamanRequest.AnggotaId,
+		BukuId:          pinjamanRequest.BukuId,
+		TglPinjam:       pinjamanRequest.TglPinjam,
+		TglBalik:        pinjamanRequest.TglBalik,
+		PetugasPinjamId: pinjamanRequest.PetugasPinjamId,
+		ListKondisiId:   pinjamanRequest.ListKondisiId,
+		PetugasBalikId:  pinjamanRequest.PetugasBalikId,
+	}
+	err := b.repo.Update(pinjaman)
 	if err != nil {
 		log.Println(err)
 	}
@@ -73,11 +82,11 @@ func (b *pinjamanService) Delete(id int) {
 	}
 }
 
-func (b *pinjamanService) GetById(id int) *model.Pinjaman {
+func (b *pinjamanService) GetById(id int) *ResponsePinjaman {
 	barispinjaman := b.repo.GetById(id)
 
-	var pinjaman model.Pinjaman
-	if err := barispinjaman.Scan(&pinjaman.Id, &pinjaman.AnggotaId, &pinjaman.BukuId, &pinjaman.TglPinjam, &pinjaman.TglBalik, &pinjaman.ListKondisiId, &pinjaman.ListKondisiId, &pinjaman.PetuagasBalikId); err != nil {
+	var pinjaman ResponsePinjaman
+	if err := barispinjaman.Scan(&pinjaman.Id, &pinjaman.AnggotaId, &pinjaman.BukuId, &pinjaman.TglPinjam, &pinjaman.TglBalik, &pinjaman.ListKondisiId, &pinjaman.ListKondisiId, &pinjaman.PetugasBalikId); err != nil {
 		log.Println(err)
 	}
 	return &pinjaman

@@ -1,4 +1,4 @@
-package denda
+package anggota
 
 import (
 	"database/sql"
@@ -12,39 +12,39 @@ func Router(g *gin.RouterGroup, db *sql.DB) {
 
 	service := NewService(repo)
 
-	denda := g.Group("/denda")
-	denda.GET("", func(ctx *gin.Context) {
+	anggota := g.Group("/anggota")
+	anggota.GET("", func(ctx *gin.Context) {
 		ctx.JSON(200, service.Get())
 	})
 
-	denda.GET("/:id", func(ctx *gin.Context) {
+	anggota.GET("/:id", func(ctx *gin.Context) {
 
 		id, _ := strconv.Atoi(ctx.Param("id"))
 
 		ctx.JSON(200, service.GetById(id))
 
 	})
-	denda.DELETE("/:id", func(ctx *gin.Context) {
+	anggota.DELETE("/:id", func(ctx *gin.Context) {
 		id, _ := strconv.Atoi(ctx.Param("id"))
 		service.Delete(id)
 		ctx.JSON(200, gin.H{"message": "success"})
 	})
 
-	denda.POST("", func(ctx *gin.Context) {
+	anggota.POST("", func(ctx *gin.Context) {
 		var request *CreateRequest
 		err := ctx.BindJSON(&request)
 		if err != nil {
 			ctx.JSON(400, gin.H{"message": "error bree"})
 		}
 
-		service.CreateDenda(*request)
+		service.CreateAnggota(*request)
 		ctx.JSON(200, gin.H{
 			"message": "created",
 		})
 
 	})
 
-	denda.PUT("/:id", func(ctx *gin.Context) {
+	anggota.PUT("/:id", func(ctx *gin.Context) {
 		id, _ := strconv.Atoi(ctx.Param("id"))
 
 		var request *CreateRequest
@@ -52,8 +52,8 @@ func Router(g *gin.RouterGroup, db *sql.DB) {
 		if err != nil {
 			ctx.JSON(400, gin.H{"message": "error bree"})
 		}
-		
-		service.Update(request,id)
+
+		service.Update(request, id)
 	})
 
 }

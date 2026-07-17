@@ -6,53 +6,63 @@ import (
 )
 
 type Anggota interface {
-	Get() []model.Anggota
-	CreateBuku(no_anggota int, nama string, klAID int, alumni bool)
-	Update(anggota model.Anggota)
+	Get() []ResponseAnggota
+	CreateAnggota(anggotaRequest CreateRequest)
+	Update(anggota *CreateRequest, id int)
 	Delete(id int)
-	GetById(id int) *model.Anggota
+	GetById(id int) *ResponseAnggota
 }
 
 type anggotaService struct {
 	repo Repository
 }
 
-var data []model.Anggota
-
 func NewService(repo Repository) Anggota {
 	return &anggotaService{repo}
 }
 
-func (b *anggotaService) CreateBuku(no_anggota int, nama string, klAID int, alumni bool) {
-	anggota := model.Anggota{}
+func (b *anggotaService) CreateAnggota(anggotaRequest CreateRequest) {
+	anggota := model.Anggota{
+		NoAnggota:            anggotaRequest.NoAnggota,
+		Nama:                 anggotaRequest.Nama,
+		KlasifikasiAnggotaId: anggotaRequest.KlasifikasiAnggotaId,
+		Alumni:               anggotaRequest.Alumni,
+	}
 	err := b.repo.Create(&anggota)
 	if err != nil {
 		log.Println(err)
 	}
 
 }
-func (b *anggotaService) Get() []model.Anggota {
-	var anggotaanggota []model.Anggota
+func (b *anggotaService) Get() []ResponseAnggota {
+	var anggotaAnggota []ResponseAnggota
 	anggotaanggotaRepo, err := b.repo.GetAll()
 
 	if err != nil {
 		log.Println(err)
-		return anggotaanggota
+		return anggotaAnggota
 	}
 	// log.Println(anggotaanggotaRepo)
 	for anggotaanggotaRepo.Next() {
 
-		var anggota model.Anggota
-		if err := anggotaanggotaRepo.Scan(&anggota.ID, &anggota.NoAnggota, &anggota.Nama, &anggota.KlasifikasiAnggotaId, &anggota.Alumni); err != nil {
-			return anggotaanggota
+		var anggota ResponseAnggota
+		if err := anggotaanggotaRepo.Scan(&anggota.Id, &anggota.NoAnggota, &anggota.Nama, &anggota.KlasifikasiAnggotaId, &anggota.Alumni); err != nil {
+			return anggotaAnggota
 		}
-		anggotaanggota = append(anggotaanggota, anggota)
+		anggotaAnggota = append(anggotaAnggota, anggota)
 	}
-	return anggotaanggota
+	return anggotaAnggota
 }
 
-func (b *anggotaService) Update(anggota model.Anggota) {
-	err := b.repo.Update(&anggota)
+func (b *anggotaService) Update(anggotaRequest *CreateRequest, id int) {
+	anggota := &model.Anggota{
+		ID:                   id,
+		NoAnggota:            anggotaRequest.NoAnggota,
+		Nama:                 anggotaRequest.Nama,
+		KlasifikasiAnggotaId: anggotaRequest.KlasifikasiAnggotaId,
+		Alumni:               anggotaRequest.Alumni,
+	}
+	err := b.repo.Update(anggota)
 	if err != nil {
 		log.Println(err)
 	}
@@ -64,11 +74,11 @@ func (b *anggotaService) Delete(id int) {
 	}
 }
 
-func (b *anggotaService) GetById(id int) *model.Anggota {
+func (b *anggotaService) GetById(id int) *ResponseAnggota {
 	barisanggota := b.repo.GetById(id)
 
-	var anggota model.Anggota
-	if err := barisanggota.Scan(&anggota.ID, &anggota.NoAnggota, &anggota.Nama, &anggota.KlasifikasiAnggotaId, &anggota.Alumni); err != nil {
+	var anggota ResponseAnggota
+	if err := barisanggota.Scan(&anggota.Id, &anggota.NoAnggota, &anggota.Nama, &anggota.KlasifikasiAnggotaId, &anggota.Alumni); err != nil {
 		log.Println(err)
 	}
 	return &anggota
