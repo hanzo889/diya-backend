@@ -6,11 +6,11 @@ import (
 )
 
 type Petugas interface {
-	Get() []model.Petugas
-	CreatePetugas(anggotaid int)
-	Update(petugas model.Petugas)
+	Get() []responsePetugas
+	CreatePetugas(petugas CreateRequest)
+	Update(petugas *CreateRequest,id int)
 	Delete(id int)
-	GetById(id int) *model.Petugas
+	GetById(id int) *responsePetugas
 }
 
 type petugasService struct {
@@ -23,16 +23,18 @@ func NewService(repo Repository) Petugas {
 	return &petugasService{repo}
 }
 
-func (b *petugasService) CreatePetugas(anggotaid int) {
-	petugas := model.Petugas{}
-	err := b.repo.CreatePetugas(&petugas)
+func (b *petugasService) CreatePetugas(ptg CreateRequest) {
+	petugas := &model.Petugas{
+		AnggotaId: ptg.AnggotaId,
+	}
+	err := b.repo.CreatePetugas(petugas)
 	if err != nil {
 		log.Println(err)
 	}
 
 }
-func (b *petugasService) Get() []model.Petugas {
-	var petugaspetugas []model.Petugas
+func (b *petugasService) Get() []responsePetugas {
+	var petugaspetugas []responsePetugas
 	petugaspetugasRepo, err := b.repo.GetAll()
 
 	if err != nil {
@@ -42,7 +44,7 @@ func (b *petugasService) Get() []model.Petugas {
 	// log.Println(petugaspetugasRepo)
 	for petugaspetugasRepo.Next() {
 
-		var petugas model.Petugas
+		var petugas responsePetugas
 		if err := petugaspetugasRepo.Scan(&petugas.Id, &petugas.AnggotaId); err != nil {
 			return petugaspetugas
 		}
@@ -51,8 +53,12 @@ func (b *petugasService) Get() []model.Petugas {
 	return petugaspetugas
 }
 
-func (b *petugasService) Update(petugas model.Petugas) {
-	err := b.repo.Update(&petugas)
+func (b *petugasService) Update(ptg *CreateRequest,id int) {
+	petugas := &model.Petugas{
+		AnggotaId: ptg.AnggotaId,
+	}
+
+	err := b.repo.Update(petugas)
 	if err != nil {
 		log.Println(err)
 	}
@@ -64,10 +70,10 @@ func (b *petugasService) Delete(id int) {
 	}
 }
 
-func (b *petugasService) GetById(id int) *model.Petugas {
+func (b *petugasService) GetById(id int) *responsePetugas {
 	barispetugas := b.repo.GetById(id)
 
-	var petugas model.Petugas
+	var petugas responsePetugas
 	if err := barispetugas.Scan(&petugas.Id, &petugas.AnggotaId); err != nil {
 		log.Println(err)
 	}

@@ -3,15 +3,14 @@ package reservasi
 import (
 	"library/app/model"
 	"log"
-	"time"
 )
 
 type Reservasi interface {
-	Get() []model.Reservasi
-	CreateReservasi(anggota_id int, buku_id int, batas_pengembaliaan time.Time)
-	Update(reservasi model.Reservasi)
+	Get() []responReservasi
+	CreateReservasi(rsv CreateRequest)
+	Update(rsv *CreateRequest,id int)
 	Delete(id int)
-	GetById(id int) *model.Reservasi
+	GetById(id int) *responReservasi
 }
 
 type reservasiService struct {
@@ -24,11 +23,11 @@ func NewService(repo Repository) Reservasi {
 	return &reservasiService{repo}
 }
 
-func (b *reservasiService) CreateReservasi(anggota_id int, buku_id int, batas_pengembaliaan time.Time) {
+func (b *reservasiService) CreateReservasi(rsv CreateRequest) {
 	reservasi := &model.Reservasi{
-		AnggotaId:        anggota_id,
-		BukuId:           buku_id,
-		BatasPengambilan: batas_pengembaliaan,
+		AnggotaId:        rsv.AnggotaId,
+		BukuId:           rsv.BukuId,
+		BatasPengambilan: rsv.BatasPengambilan,
 	}
 	err := b.repo.Create(reservasi)
 	if err != nil {
@@ -36,8 +35,8 @@ func (b *reservasiService) CreateReservasi(anggota_id int, buku_id int, batas_pe
 	}
 
 }
-func (b *reservasiService) Get() []model.Reservasi {
-	var reservasiii []model.Reservasi
+func (b *reservasiService) Get() []responReservasi {
+	var reservasiii []responReservasi
 	reservasiiiRepo, err := b.repo.GetAll()
 
 	if err != nil {
@@ -47,7 +46,7 @@ func (b *reservasiService) Get() []model.Reservasi {
 	// log.Println(reservasiiiRepo)
 	for reservasiiiRepo.Next() {
 
-		var reservasi model.Reservasi
+		var reservasi responReservasi
 		if err := reservasiiiRepo.Scan(&reservasi.Id, &reservasi.AnggotaId, &reservasi.BukuId, &reservasi.BatasPengambilan); err != nil {
 			return reservasiii
 		}
@@ -56,8 +55,13 @@ func (b *reservasiService) Get() []model.Reservasi {
 	return reservasiii
 }
 
-func (b *reservasiService) Update(reservasi model.Reservasi) {
-	err := b.repo.Update(&reservasi)
+func (b *reservasiService) Update(rsv *CreateRequest,id int) {
+	reservasi := &model.Reservasi{
+		AnggotaId:        rsv.AnggotaId,
+		BukuId:           rsv.BukuId,
+		BatasPengambilan: rsv.BatasPengambilan,
+	}
+	err := b.repo.Update(reservasi)
 	if err != nil {
 		log.Println(err)
 	}
@@ -69,10 +73,10 @@ func (b *reservasiService) Delete(id int) {
 	}
 }
 
-func (b *reservasiService) GetById(id int) *model.Reservasi {
+func (b *reservasiService) GetById(id int) *responReservasi {
 	barisreservasi := b.repo.GetById(id)
 
-	var reservasi model.Reservasi
+	var reservasi responReservasi
 	if err := barisreservasi.Scan(&reservasi.Id, &reservasi.AnggotaId, &reservasi.BukuId, &reservasi.BatasPengambilan); err != nil {
 		log.Println(err)
 	}

@@ -6,11 +6,11 @@ import (
 )
 
 type ListKategori interface {
-	Get() []model.ListKategori
-	CreateListKategori(kategori string)
-	Update(list_kodisi model.ListKategori)
+	Get() []responseListKategori
+	CreateListKategori(lkr CreateRequest)
+	Update(list_kodisi *CreateRequest,id int)
 	Delete(id int)
-	GetById(id int) *model.ListKategori
+	GetById(id int) *responseListKategori
 }
 
 type ListKategoriService struct {
@@ -23,9 +23,9 @@ func NewService(repo Repository) ListKategori {
 	return &ListKategoriService{repo}
 }
 
-func (b *ListKategoriService) CreateListKategori(kategori string) {
+func (b *ListKategoriService) CreateListKategori(lkr CreateRequest) {
 	ListKategori := &model.ListKategori{
-		Kategori: kategori,
+		Kategori: lkr.Kategori,
 	}
 	err := b.repo.Create(ListKategori)
 	if err != nil {
@@ -33,8 +33,8 @@ func (b *ListKategoriService) CreateListKategori(kategori string) {
 	}
 
 }
-func (b *ListKategoriService) Get() []model.ListKategori {
-	var kategorikategori []model.ListKategori
+func (b *ListKategoriService) Get() []responseListKategori{
+	var kategorikategori []responseListKategori
 	kategorikategoriRepo, err := b.repo.GetAll()
 
 	if err != nil {
@@ -44,7 +44,7 @@ func (b *ListKategoriService) Get() []model.ListKategori {
 	// log.Println(kategorikategoriRepo)
 	for kategorikategoriRepo.Next() {
 
-		var kategori model.ListKategori
+		var kategori responseListKategori
 		if err := kategorikategoriRepo.Scan(&kategori.Id, &kategori.Kategori); err != nil {
 			return kategorikategori
 		}
@@ -53,8 +53,11 @@ func (b *ListKategoriService) Get() []model.ListKategori {
 	return kategorikategori
 }
 
-func (b *ListKategoriService) Update(list_kategori model.ListKategori) {
-	err := b.repo.Update(&list_kategori)
+func (b *ListKategoriService)Update(lkr *CreateRequest, id int) {
+	ListKategori := &model.ListKategori{
+		Kategori: lkr.Kategori,
+	}
+	err := b.repo.Update(ListKategori)
 	if err != nil {
 		log.Println(err)
 	}
@@ -66,10 +69,10 @@ func (b *ListKategoriService) Delete(id int) {
 	}
 }
 
-func (b ListKategoriService) GetById(id int) *model.ListKategori {
+func (b ListKategoriService) GetById(id int) *responseListKategori {
 	bariskategori := b.repo.GetById(id)
 
-	var kategori model.ListKategori
+	var kategori responseListKategori
 	if err := bariskategori.Scan(&kategori.Id, kategori.Kategori); err != nil {
 		log.Println(err)
 	}
