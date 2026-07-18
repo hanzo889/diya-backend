@@ -7,11 +7,11 @@ import (
 )
 
 type KlasifikasiAnggota interface {
-	Get() []model.KlasifikasiAnggota
-	CreateBuku(kl string, maksB int, maksH int)
-	Update(KlA model.KlasifikasiAnggota)
+	Get() []responseKlasifikasiAnggota
+	CreateKlasifikasiAnggota(klasifikasiAnggotaRequest CreateRequest)
+	Update(klasifikasiAnggotaRequest *CreateRequest, id int)
 	Delete(id int)
-	GetById(id int) *model.KlasifikasiAnggota
+	GetById(id int) *responseKlasifikasiAnggota
 }
 
 type klasifikasianggotaService struct {
@@ -24,40 +24,46 @@ func NewService(repo Repository) KlasifikasiAnggota {
 	return &klasifikasianggotaService{repo}
 }
 
-func (b *klasifikasianggotaService) CreateBuku(kl string, maksB int, maksH int) {
-	Kla := &model.KlasifikasiAnggota{
-		Klasifikasi: kl,
-		MaksBuku:    maksB,
-		MaksHari:    maksH,
+func (b *klasifikasianggotaService) CreateKlasifikasiAnggota(klasifikasiAnggotaRequest CreateRequest) {
+	klasifikasianggota := &model.KlasifikasiAnggota{
+		Klasifikasi: klasifikasiAnggotaRequest.Klasifikasi,
+		MaksBuku:    klasifikasiAnggotaRequest.MaksBuku,
+		MaksHari:    klasifikasiAnggotaRequest.MaksHari,
 	}
-	err := b.repo.Create(Kla)
+	err := b.repo.Create(klasifikasianggota)
 	if err != nil {
 		log.Println(err)
 	}
 
 }
-func (b *klasifikasianggotaService) Get() []model.KlasifikasiAnggota {
-	var klA2 []model.KlasifikasiAnggota
+func (b *klasifikasianggotaService) Get() []responseKlasifikasiAnggota {
+	var klasifikasiAnggotaAnggota []responseKlasifikasiAnggota
 	klA2Repo, err := b.repo.GetAll()
 
 	if err != nil {
 		log.Println(err)
-		return klA2
+		return klasifikasiAnggotaAnggota
 	}
 	// log.Println(bukuBukuRepo)
 	for klA2Repo.Next() {
 
-		var kla model.KlasifikasiAnggota
-		if err := klA2Repo.Scan(&kla.Id, &kla.Klasifikasi, &kla.MaksBuku, &kla.MaksHari); err != nil {
-			return klA2
+		var klasifikasiAnggota responseKlasifikasiAnggota
+		if err := klA2Repo.Scan(&klasifikasiAnggota.Id, &klasifikasiAnggota.Klasifikasi, &klasifikasiAnggota.MaksBuku, &klasifikasiAnggota.MaksHari); err != nil {
+			return klasifikasiAnggotaAnggota
 		}
-		klA2 = append(klA2, kla)
+		klasifikasiAnggotaAnggota = append(klasifikasiAnggotaAnggota, klasifikasiAnggota)
 	}
-	return klA2
+	return klasifikasiAnggotaAnggota
 }
 
-func (b *klasifikasianggotaService) Update(KlA model.KlasifikasiAnggota) {
-	err := b.repo.Update(&KlA)
+func (b *klasifikasianggotaService) Update(klasifikasiAnggotaRequest *CreateRequest, id int) {
+	klasifikasiAnggota := &model.KlasifikasiAnggota{
+		Id:          id,
+		Klasifikasi: klasifikasiAnggotaRequest.Klasifikasi,
+		MaksBuku:    klasifikasiAnggotaRequest.MaksBuku,
+		MaksHari:    klasifikasiAnggotaRequest.MaksHari,
+	}
+	err := b.repo.Update(klasifikasiAnggota)
 	if err != nil {
 		log.Println(err)
 	}
@@ -69,12 +75,12 @@ func (b *klasifikasianggotaService) Delete(id int) {
 	}
 }
 
-func (b *klasifikasianggotaService) GetById(id int) *model.KlasifikasiAnggota {
-	barisklA := b.repo.GetById(id)
+func (b *klasifikasianggotaService) GetById(id int) *responseKlasifikasiAnggota {
+	barisKlasifikasiAnggota := b.repo.GetById(id)
 
-	var klA model.KlasifikasiAnggota
-	if err := barisklA.Scan(&klA.Id, &klA.Klasifikasi, &klA.MaksBuku, &klA.MaksHari); err != nil {
+	var klasifikasiAnggota responseKlasifikasiAnggota
+	if err := barisKlasifikasiAnggota.Scan(&klasifikasiAnggota.Id, &klasifikasiAnggota.Klasifikasi, &klasifikasiAnggota.MaksBuku, &klasifikasiAnggota.MaksHari); err != nil {
 		log.Println(err)
 	}
-	return &klA
+	return &klasifikasiAnggota
 }
