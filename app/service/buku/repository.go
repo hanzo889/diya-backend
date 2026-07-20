@@ -24,7 +24,7 @@ func NewRepository(db *sql.DB) Repository {
 }
 
 func (r *repository) Create(buku *model.Buku) error {
-	_, err := r.db.Exec("insert into buku (judul,list_katagori_id,stock) values(?,?,?)", buku.Judul, buku.ListKategoriId, buku.Stock)
+	_, err := r.db.Exec("insert into buku (judul,list_kategori_id,stock) values(?,?,?)", buku.Judul, buku.ListKategoriId, buku.Stock)
 	return err
 }
 
@@ -33,7 +33,7 @@ func (r *repository) GetAll() (*sql.Rows, error) {
 }
 
 func (r *repository) Update(buku *model.Buku) error {
-	_, err := r.db.Exec("update buku set judul=?, list_katagori_id=?, stock=? where id=?", buku.Judul, buku.ListKategoriId, buku.Stock, buku.Id)
+	_, err := r.db.Exec("update buku set judul=?, list_kategori_id=?, stock=? where id=?", buku.Judul, buku.ListKategoriId, buku.Stock, buku.Id)
 	return err
 }
 

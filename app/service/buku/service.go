@@ -23,7 +23,6 @@ func NewService(repo Repository) Buku {
 }
 
 func (b *bukuService) CreateBuku(bukuRequest CreateRequest) {
-
 	buku := &model.Buku{
 		Judul:          bukuRequest.Judul,
 		ListKategoriId: bukuRequest.ListKategoriId,
@@ -31,7 +30,7 @@ func (b *bukuService) CreateBuku(bukuRequest CreateRequest) {
 	}
 	err := b.repo.Create(buku)
 	if err != nil {
-		log.Println(err)
+		log.Println("***",err)
 	}
 
 }

@@ -15,6 +15,7 @@ import (
 	"library/app/service/reservasi"
 	"library/database"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,20 +23,27 @@ func Run() {
 	db := database.MysqlConnection()
 	defer db.Close()
 	router := gin.Default()
-
+	router.SetTrustedProxies(nil)
+	config := cors.DefaultConfig()
+	config.AllowOrigins = []string{"*"}
+	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
+	config.AllowHeaders = []string{"Authorization", "Content-Type"}
+	config.ExposeHeaders = []string{"Content-Length"}
+	config.AllowCredentials = false
+	router.Use(cors.New(config))
 	api := router.Group("/api")
 
 	buku.Router(api, db)
-	bukuhub.Router(api,db)
-	denda.Router(api,db)
-	hargabuku.Router(api,db)
-	rak.Router(api,db)
-	listkondisi.Router(api,db)
-	listkategori.Router(api,db)
-	anggota.Router(api,db)
-	klasifikasianggota.Router(api,db)
-	reservasi.Router(api,db)
-	pinjaman.Router(api,db)
-	petugas.Router(api,db)
+	bukuhub.Router(api, db)
+	denda.Router(api, db)
+	hargabuku.Router(api, db)
+	rak.Router(api, db)
+	listkondisi.Router(api, db)
+	listkategori.Router(api, db)
+	anggota.Router(api, db)
+	klasifikasianggota.Router(api, db)
+	reservasi.Router(api, db)
+	pinjaman.Router(api, db)
+	petugas.Router(api, db)
 	router.Run()
 }
