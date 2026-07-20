@@ -7,4 +7,3 @@ type Anggota struct{
 	KlasifikasiAnggotaId int
 	Alumni bool
 }
-

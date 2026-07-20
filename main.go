@@ -1,6 +1,8 @@
 package main
 
-import "library/app"
+import (
+	"library/app"
+)
 
 // import (
 // 	"github.com/gin-gonic/gin"
@@ -30,40 +32,21 @@ import "library/app"
 
 // "log"
 
+// func Stop(){
+// 	time.Sleep(2*time.Second)
+// 	println("stop")
+// }
+
 func main() {
 
 	app.Run()
-	
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	// defer Stop()
+	// fmt.Println("halo")
 
 	// siswa:=Siswa{
 	// 	Nisn: 134,
 	// 	Nama: "royyan",
 	// }
-
-
 
 	// r := gin.Default()
 	// r.GET("",func (c *gin.Context)  {
@@ -83,9 +66,6 @@ func main() {
 	// 	c.JSON(200,siswa)
 
 	// })
-
-	
-
 
 	// r.Run()
 

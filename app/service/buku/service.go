@@ -1,6 +1,7 @@
 package buku
 
 import (
+	"fmt"
 	"library/app/model"
 	"log"
 )
@@ -46,12 +47,13 @@ func (b *bukuService) Get() []ResponseBuku {
 	for bukuBukuRepo.Next() {
 
 		var buku ResponseBuku
+		fmt.Println(bukuBukuRepo)
 		if err := bukuBukuRepo.Scan(&buku.Id, &buku.Judul, &buku.ListKategoriId, &buku.Stock); err != nil {
+			
 			return bukuBuku
 		}
 		bukuBuku = append(bukuBuku, buku)
 	}
-
 	return bukuBuku
 }
 

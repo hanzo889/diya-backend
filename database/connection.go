@@ -29,6 +29,7 @@ func MysqlConnection() *sql.DB {
 
 	if err = db.Ping(); err != nil {
 		log.Fatalf("ping ke database gagal:%v", err)
+		log.Panic("gagal koneksi")
 	}
 	return db
 }
