@@ -33,7 +33,7 @@ func Run() {
 	router.Use(cors.New(config))
 	api := router.Group("/api")
 
-	buku.Router(api, db)
+	buku.Router(api, db,)
 	bukuhub.Router(api, db)
 	denda.Router(api, db)
 	hargabuku.Router(api, db)

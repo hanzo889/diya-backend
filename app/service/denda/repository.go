@@ -24,7 +24,7 @@ func NewRepository(db *sql.DB) Repository {
 }
 
 func (r *repository) Create(denda *model.Denda) error {
-	_, err := r.db.Exec("insert into denda (petugas_id,buku_id,list_kondisi_id,total_hari,denda,harga_buku_id,total_denda) values(?,?,?,?,?,?,?)", denda.PetugasId, denda.BukuId, denda.ListKondisiId, denda.TotalHari, denda.HargaBukuId, denda.TotalDenda)
+	_, err := r.db.Exec("insert into denda (petugas_id,buku_id,list_kondisi_id,total_hari,denda,harga_buku_id,total_denda) values(?,?,?,?,?,?,?)", denda.PetugasId, denda.BukuId, denda.ListKondisiId, denda.TotalHari, denda.Denda,denda.HargaBukuId, denda.TotalDenda)
 	return err
 }
 
@@ -33,7 +33,7 @@ func (r *repository) GetAll() (*sql.Rows, error) {
 }
 
 func (r *repository) Update(denda *model.Denda) error {
-	_, err := r.db.Exec("update denda set petugas_id=?,buku_id=?,list_kondisi_id=?,total_hari=?,denda=?,harga_buku_id=?,total_denda where id=?", denda.PetugasId, denda.BukuId, denda.ListKondisiId, denda.TotalHari, denda.HargaBukuId, denda.TotalDenda)
+	_, err := r.db.Exec("update denda set petugas_id=?,buku_id=?,list_kondisi_id=?,total_hari=?,denda=?,harga_buku_id=?,total_denda=? where id=?", denda.PetugasId, denda.BukuId, denda.ListKondisiId, denda.TotalHari, denda.Denda,denda.HargaBukuId, denda.TotalDenda,denda.Id)
 	return err
 }
 

@@ -1,8 +1,8 @@
 package  denda
 
 type CreateRequest struct{
-	PetugasId int `json:"petugasId"`
-	BukuId int `json:"bukuId"`
+	PetugasId int `json:"petugas_id"`
+	BukuId int `json:"buku_id"`
 	ListKondisiId int `json:"list_kondisi_id"`
 	TotalHari int `json:"total_hari"`
 	Denda int `json:"denda"`

@@ -24,7 +24,7 @@ func NewRepository(db *sql.DB) Repository {
 }
 
 func (r *repository) Create(listKategori *model.ListKategori) error {
-	_, err := r.db.Exec("insert into list_kondisi(kondisi) values(?)", listKategori.Kategori)
+	_, err := r.db.Exec("insert into list_katagori(kondisi) values(?)", listKategori.Kategori)
 	return err
 }
 

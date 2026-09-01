@@ -29,7 +29,7 @@ func (r *repository) Create(bukuhub *model.BukuHub) error {
 }
 
 func (r *repository) GetAll() (*sql.Rows, error) {
-	return r.db.Query("select * from buku")
+	return r.db.Query("select * from buku_hub")
 }
 
 func (r *repository) Update(bukuhub *model.BukuHub) error {

@@ -7,8 +7,8 @@ import (
 
 type Petugas interface {
 	Get() []responsePetugas
-	CreatePetugas(petugas CreateRequest)
-	Update(petugas *CreateRequest,id int)
+	CreatePetugas(ptg CreateRequest)
+	Update(ptg *CreateRequest, id int)
 	Delete(id int)
 	GetById(id int) *responsePetugas
 }
@@ -53,11 +53,11 @@ func (b *petugasService) Get() []responsePetugas {
 	return petugaspetugas
 }
 
-func (b *petugasService) Update(ptg *CreateRequest,id int) {
+func (b *petugasService) Update(ptg *CreateRequest, id int) {
 	petugas := &model.Petugas{
+		Id: id,
 		AnggotaId: ptg.AnggotaId,
 	}
-
 	err := b.repo.Update(petugas)
 	if err != nil {
 		log.Println(err)

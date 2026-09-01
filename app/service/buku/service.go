@@ -8,7 +8,7 @@ import (
 
 type Buku interface {
 	Get() []ResponseBuku
-	CreateBuku(bukuRequest CreateRequest)
+	CreateBuku(bukuRequest CreateRequest)error
 	Update(bukuRequest *CreateRequest, id int)
 	Delete(id int)
 	GetById(id int) *ResponseBuku
@@ -22,7 +22,7 @@ func NewService(repo Repository) Buku {
 	return &bukuService{repo}
 }
 
-func (b *bukuService) CreateBuku(bukuRequest CreateRequest) {
+func (b *bukuService) CreateBuku(bukuRequest CreateRequest) error{
 	buku := &model.Buku{
 		Judul:          bukuRequest.Judul,
 		ListKategoriId: bukuRequest.ListKategoriId,
@@ -32,7 +32,7 @@ func (b *bukuService) CreateBuku(bukuRequest CreateRequest) {
 	if err != nil {
 		log.Println("***",err)
 	}
-
+return err
 }
 func (b *bukuService) Get() []ResponseBuku {
 	var bukuBuku []ResponseBuku

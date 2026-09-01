@@ -11,6 +11,7 @@ type Repository interface {
 	Update(anggota *model.Anggota) error
 	Delete(id int) error
 	GetById(id int) *sql.Row
+	GetMaxNoAnggota() *sql.Row
 }
 
 type repository struct {
@@ -24,7 +25,7 @@ func NewRepository(db *sql.DB) Repository {
 }
 
 func (r *repository) Create(anggota *model.Anggota) error {
-	_, err := r.db.Exec("insert into anggota(no_anggota,nama,klasifikasi_anggota_id,alumni) values(?,?,?,?)", anggota.NoAnggota, anggota.Nama, anggota.KlasifikasiAnggotaId, anggota.Alumni)
+	_, err := r.db.Exec("insert into anggota(no_anggota,nama,alumni) values(?,?,?)", anggota.NoAnggota, anggota.Nama, anggota.Alumni)
 	return err
 }
 
@@ -33,7 +34,7 @@ func (r *repository) GetAll() (*sql.Rows, error) {
 }
 
 func (r *repository) Update(anggota *model.Anggota) error {
-	_, err := r.db.Exec("update anggota set no_anggota=?, nama=?, klasifikasi_anggota_id=? alumni=? where id=?", anggota.NoAnggota, anggota.Nama, anggota.KlasifikasiAnggotaId, anggota.Alumni, anggota.ID)
+	_, err := r.db.Exec("update anggota set  nama=? ,alumni=? where id=?", anggota.Nama, anggota.Alumni, anggota.ID)
 	return err
 }
 
@@ -44,4 +45,7 @@ func (r *repository) Delete(id int) error {
 
 func (r *repository) GetById(id int) *sql.Row {
 	return r.db.QueryRow("select * from anggota where id=?", id)
+}
+func (r *repository) GetMaxNoAnggota() *sql.Row {
+	return r.db.QueryRow("select max(no_anggota) from anggota")
 }

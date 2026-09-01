@@ -3,7 +3,7 @@
 
 GET {{host}}/
 ###`
-GET {{host}}/api/buku
+GET {{host}}/api/anggota
 ###
 GET {{host}}/api/buku
 ###
@@ -11,13 +11,20 @@ GET {{host}}/api/buku/5
 ###
 DELETE {{host}}/api/buku/6
 ###
-POST {{host}}/api/buku
+POST {{host}}/api/anggota
 Content-Type: application/json
 
 {
-    "judul":"meja",
-    "list_kategori_id":2,
-    "stock":400
+    
+    "nama":"iiii",
+    "alumni":false
+}
+###
+POST {{host}}/api/petugas
+Content-Type: application/json
+
+{
+    "anggota_id":8,
 }
 ###
 PUT {{host}}/api/buku/8
@@ -29,13 +36,42 @@ Content-Type: application/json
     "stock":400
 }
 ###
+PUT {{host}}/api/petugas/1
+Content-Type: application/json
+
+{
+    "anggota_id":9
+}
+
+###
 GET {{host}}/api/buku-hub
 ###
 GET {{host}}/api/buku-hub/2
 ###
-DELETE {{host}}/api/buku-hub/1
+DELETE {{host}}/api/harga-buku/2
 ###
 GET {{host}}/api/denda
+###
+POST  {{host}}/api/denda
+Content-Type: application/json
+
+{
+  "petugas_id":1,
+  "list_kondisi_id": 2,
+  "total_hari": 3,
+  "denda":19,
+  "harga_buku_id": 1,
+  "total_denda": 10,
+}
+###
+POST  {{host}}/api/klasifikasi-anggota
+Content-Type: application/json
+
+{
+  "klasifikasi": "test",
+  "maks_buku": 2,
+  "maks_hari": 3,
+}
 ###
 GET {{host}}/api/harga-buku
 ###
