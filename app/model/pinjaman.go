@@ -2,13 +2,15 @@ package model
 
 import "time"
 
-type Pinjaman struct{
-	Id int
-	AnggotaId int 
-	BukuId int
-	TglPinjam time.Time
-	TglBalik time.Time
+type Pinjaman struct {
+	Id              int
+	AnggotaId       int
+	BukuId          int
+	TglPinjam       time.Time
+	TglBalik        time.Time
 	PetugasPinjamId int
-	ListKondisiId int
 	PetugasBalikId int
+	KondisiAwalId  int
+	KondisiAkhirId int
+	Status         string
 }

@@ -9,6 +9,9 @@ type ResponsePinjaman struct {
 	TglPinjam       time.Time `json:"tgl_pinjam"`
 	TglBalik        time.Time `json:"tgl_balik"`
 	PetugasPinjamId int       `json:"petugas_pinjam_id"`
-	ListKondisiId   int       `json:"list_kondisi_id"`
-	PetugasBalikId  int       `json:"petugas_balik_id"`
+
+	PetugasBalikId int    `json:"petugas_balik_id"`
+	KondisiAwalId  int    `json:"kondisi_awal_id"`
+	KondisiAkhirId int    `json:"kondisi_akhir_id"`
+	Status         string `json:"status"`
 }

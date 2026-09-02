@@ -30,8 +30,10 @@ func (b *pinjamanService) CreatePinjaman(pinjamanRequest CreateRequest) {
 		TglPinjam:       pinjamanRequest.TglPinjam,
 		TglBalik:        pinjamanRequest.TglBalik,
 		PetugasPinjamId: pinjamanRequest.PetugasPinjamId,
-		ListKondisiId:   pinjamanRequest.ListKondisiId,
-		PetugasBalikId:  pinjamanRequest.PetugasBalikId,
+		PetugasBalikId: pinjamanRequest.PetugasBalikId,
+		KondisiAwalId: pinjamanRequest.KondisiAwalId,
+		KondisiAkhirId: pinjamanRequest.KondisiAkhirId,
+		Status:          pinjamanRequest.Status,
 	}
 	err := b.repo.Create(pinjaman)
 	if err != nil {
@@ -51,7 +53,7 @@ func (b *pinjamanService) Get() []ResponsePinjaman {
 	for pinjamanpinjamanRepo.Next() {
 
 		var pinjaman ResponsePinjaman
-		if err := pinjamanpinjamanRepo.Scan(&pinjaman.Id, &pinjaman.AnggotaId, &pinjaman.BukuId, &pinjaman.TglPinjam, &pinjaman.TglBalik, &pinjaman.ListKondisiId, &pinjaman.ListKondisiId, &pinjaman.PetugasBalikId); err != nil {
+		if err := pinjamanpinjamanRepo.Scan(&pinjaman.Id, &pinjaman.AnggotaId, &pinjaman.BukuId, &pinjaman.TglPinjam, &pinjaman.TglBalik,&pinjaman.PetugasPinjamId, &pinjaman.PetugasBalikId, &pinjaman.KondisiAwalId, &pinjaman.KondisiAkhirId, &pinjaman.Status); err != nil {
 			return pinjamanpinjaman
 		}
 		pinjamanpinjaman = append(pinjamanpinjaman, pinjaman)
@@ -67,8 +69,10 @@ func (b *pinjamanService) Update(pinjamanRequest *CreateRequest, id int) {
 		TglPinjam:       pinjamanRequest.TglPinjam,
 		TglBalik:        pinjamanRequest.TglBalik,
 		PetugasPinjamId: pinjamanRequest.PetugasPinjamId,
-		ListKondisiId:   pinjamanRequest.ListKondisiId,
-		PetugasBalikId:  pinjamanRequest.PetugasBalikId,
+		PetugasBalikId: pinjamanRequest.PetugasBalikId,
+		KondisiAwalId:   pinjamanRequest.KondisiAwalId,
+		KondisiAkhirId:  pinjamanRequest.KondisiAkhirId,
+		Status:            pinjamanRequest.Status,
 	}
 	err := b.repo.Update(pinjaman)
 	if err != nil {
@@ -86,7 +90,7 @@ func (b *pinjamanService) GetById(id int) *ResponsePinjaman {
 	barispinjaman := b.repo.GetById(id)
 
 	var pinjaman ResponsePinjaman
-	if err := barispinjaman.Scan(&pinjaman.Id, &pinjaman.AnggotaId, &pinjaman.BukuId, &pinjaman.TglPinjam, &pinjaman.TglBalik, &pinjaman.ListKondisiId, &pinjaman.ListKondisiId, &pinjaman.PetugasBalikId); err != nil {
+	if err := barispinjaman.Scan(&pinjaman.Id, &pinjaman.AnggotaId, &pinjaman.BukuId, &pinjaman.TglPinjam, &pinjaman.TglBalik, &pinjaman.PetugasPinjamId, &pinjaman.PetugasBalikId, &pinjaman.KondisiAwalId, &pinjaman.KondisiAkhirId, &pinjaman.Status); err != nil {
 		log.Println(err)
 	}
 	return &pinjaman

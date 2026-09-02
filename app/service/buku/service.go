@@ -27,6 +27,7 @@ func (b *bukuService) CreateBuku(bukuRequest CreateRequest) error{
 		Judul:          bukuRequest.Judul,
 		ListKategoriId: bukuRequest.ListKategoriId,
 		Stock:          bukuRequest.Stock,
+		Penulis:        bukuRequest.Penulis,
 	}
 	err := b.repo.Create(buku)
 	if err != nil {
@@ -47,7 +48,7 @@ func (b *bukuService) Get() []ResponseBuku {
 
 		var buku ResponseBuku
 		fmt.Println(bukuBukuRepo)
-		if err := bukuBukuRepo.Scan(&buku.Id, &buku.Judul, &buku.ListKategoriId, &buku.Stock); err != nil {
+		if err := bukuBukuRepo.Scan(&buku.Id, &buku.Judul, &buku.ListKategoriId, &buku.Stock, &buku.Penulis); err != nil {
 			
 			return bukuBuku
 		}
@@ -62,6 +63,7 @@ func (b *bukuService) Update(bukuRequest *CreateRequest, id int) {
 		Judul:          bukuRequest.Judul,
 		ListKategoriId: bukuRequest.ListKategoriId,
 		Stock:          bukuRequest.Stock,
+		Penulis:        bukuRequest.Penulis,
 	}
 	err := b.repo.Update(buku)
 	if err != nil {
@@ -79,7 +81,7 @@ func (b *bukuService) GetById(id int) *ResponseBuku {
 	barisBuku := b.repo.GetById(id)
 
 	var buku ResponseBuku
-	if err := barisBuku.Scan(&buku.Id, &buku.Judul, &buku.ListKategoriId, &buku.Stock); err != nil {
+	if err := barisBuku.Scan(&buku.Id, &buku.Judul, &buku.ListKategoriId, &buku.Stock, &buku.Penulis); err != nil {
 		log.Println(err)
 	}
 	return &buku

@@ -5,4 +5,5 @@ type Buku struct{
 	Judul string
 	ListKategoriId int
 	Stock int
+	Penulis string
 }
