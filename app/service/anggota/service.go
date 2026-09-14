@@ -14,6 +14,7 @@ type Anggota interface {
 	Delete(id int)
 	GetById(id int) *ResponseAnggota
 	GetMaxNoAnggota() (string, error)
+	GetAnggotaByQuery(noAnggota string) (*ResponseAnggota, error)
 }
 
 type anggotaService struct {
@@ -63,8 +64,7 @@ func (b *anggotaService) Get() []ResponseAnggota {
 
 func (b *anggotaService) Update(anggotaRequest *CreateRequest, id int) {
 	anggota := &model.Anggota{
-		ID: id,
-
+		ID:     id,
 		Nama:   anggotaRequest.Nama,
 		Alumni: anggotaRequest.Alumni,
 	}
@@ -106,4 +106,13 @@ func (b *anggotaService) GetMaxNoAnggota() (string, error) {
 		log.Println(err)
 	}
 	return fmt.Sprintf("A%03d", noAnggotaTerakhirInt+1), nil
+}
+func (b *anggotaService) GetAnggotaByQuery(noAnggota string) (*ResponseAnggota, error) {
+	anggotaRepo := b.repo.GetAnggotaByNoAnggota(noAnggota)
+	var anggota ResponseAnggota
+	if err := anggotaRepo.Scan(&anggota.Id, &anggota.NoAnggota, &anggota.Nama, &anggota.Alumni); err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	return &anggota, nil
 }

@@ -5,6 +5,8 @@ GET {{host}}/
 ###`
 GET {{host}}/api/anggota
 ###
+GET {{host}}/api/anggota/search?q=A003
+###
 GET {{host}}/api/buku
 ###
 GET {{host}}/api/buku/5

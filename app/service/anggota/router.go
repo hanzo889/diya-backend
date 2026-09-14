@@ -55,5 +55,14 @@ func Router(g *gin.RouterGroup, db *sql.DB) {
 
 		service.Update(request, id)
 	})
+	anggota.GET("/search",func(ctx *gin.Context) {
+		nama:=ctx.Query("q")
+		anggota,err:=service.GetAnggotaByQuery(nama)
+		if err!=nil {
+			ctx.JSON(400,gin.H{"message":"bad request"})
+			return 
+		}
+		ctx.JSON(200,anggota)
+	})
 
 }

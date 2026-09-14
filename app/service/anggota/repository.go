@@ -12,6 +12,7 @@ type Repository interface {
 	Delete(id int) error
 	GetById(id int) *sql.Row
 	GetMaxNoAnggota() *sql.Row
+	GetAnggotaByNoAnggota(noAnggota string)*sql.Row
 }
 
 type repository struct {
@@ -48,4 +49,7 @@ func (r *repository) GetById(id int) *sql.Row {
 }
 func (r *repository) GetMaxNoAnggota() *sql.Row {
 	return r.db.QueryRow("select max(no_anggota) from anggota")
+}
+func (r *repository) GetAnggotaByNoAnggota(noAnggota string)*sql.Row {
+	return r.db.QueryRow("select * from anggota where no_anggota=?",noAnggota)
 }
