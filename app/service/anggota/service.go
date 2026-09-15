@@ -29,9 +29,14 @@ func NewService(repo Repository, repoKah klasifikasianggotahub.Repository) Anggo
 
 func (b *anggotaService) CreateAnggota(anggotaRequest CreateRequest) (int, string) {
 	getMaxNoAnggota, err := b.GetMaxNoAnggota()
+	fmt.Println(anggotaRequest)
 	if err != nil {
-		return 405, "not allowed"
+		fmt.Println("--- 1 ---")
+		fmt.Println(err)
+		return 405, "not allowed 1"
+
 	}
+
 	anggota := model.Anggota{
 		NoAnggota: getMaxNoAnggota,
 		Nama:      anggotaRequest.Nama,
@@ -41,11 +46,13 @@ func (b *anggotaService) CreateAnggota(anggotaRequest CreateRequest) (int, strin
 	lastId, err := data.LastInsertId()
 	fmt.Println(data.LastInsertId())
 	if err != nil {
-		return 405, "not allowed"
+		fmt.Println("--- 2 ---")
+		return 405, "not allowed 2"
 	}
 	err = b.repoKlasifikasiAnggotaHub.Create(&model.KlasifikasiAnggotaHub{AnggotaId: int(lastId), KlasifikasiAnggotaId: anggotaRequest.KlasifikasiAnggotaId})
 	if err != nil {
-		return 405, "not allowed"
+		fmt.Println("--- 3 ---")
+		return 405, "not allowed 3"
 	}
 	return 200, "created"
 
@@ -53,16 +60,14 @@ func (b *anggotaService) CreateAnggota(anggotaRequest CreateRequest) (int, strin
 func (b *anggotaService) Get() []ResponseAnggota {
 	var anggotaAnggota []ResponseAnggota
 	anggotaanggotaRepo, err := b.repo.GetAll()
-
 	if err != nil {
 		log.Println(err)
 		return anggotaAnggota
 	}
-	// log.Println(anggotaanggotaRepo)
 	for anggotaanggotaRepo.Next() {
 
 		var anggota ResponseAnggota
-		if err := anggotaanggotaRepo.Scan(&anggota.Id, &anggota.NoAnggota, &anggota.Nama, &anggota.Alumni); err != nil {
+		if err := anggotaanggotaRepo.Scan(&anggota.Id, &anggota.NoAnggota, &anggota.Nama, &anggota.Alumni, &anggota.KlasifikasiAnggotaId); err != nil {
 			return anggotaAnggota
 		}
 		anggotaAnggota = append(anggotaAnggota, anggota)
@@ -76,18 +81,25 @@ func (b *anggotaService) Update(anggotaRequest *CreateRequest, id int) {
 		Nama:   anggotaRequest.Nama,
 		Alumni: anggotaRequest.Alumni,
 	}
-
-	err := b.repo.Update(anggota)
-	if err != nil {
-		log.Println(err)
+	if err := b.repoKlasifikasiAnggotaHub.Update(anggotaRequest.KlasifikasiAnggotaId, anggota.ID); err == nil {
+		err = b.repo.Update(anggota)
+		if err != nil {
+			log.Println(err)
+		}
 	}
-
 }
 
 func (b *anggotaService) Delete(id int) {
-	if err := b.repo.Delete(id); err != nil {
+	var err error
+	if err = b.repoKlasifikasiAnggotaHub.Delete(id); err != nil {
 		log.Println(err)
 	}
+	if err == nil {
+		if err = b.repo.Delete(id); err != nil {
+			log.Println(err)
+		}
+	}
+
 }
 
 func (b *anggotaService) GetById(id int) *ResponseAnggota {
@@ -101,19 +113,26 @@ func (b *anggotaService) GetById(id int) *ResponseAnggota {
 }
 func (b *anggotaService) GetMaxNoAnggota() (string, error) {
 	noAnggota := b.repo.GetMaxNoAnggota()
-	var maxNoAnggota string
+	var maxNoAnggota *string
+
 	if err := noAnggota.Scan(&maxNoAnggota); err != nil {
+
 		return "", err
 	}
-	if maxNoAnggota == "" {
+	fmt.Println(*maxNoAnggota)
+
+	if maxNoAnggota == nil {
 		return "A001", nil
+	} else if maxNoAnggota != nil {
+		noAnggotaTerakhirTampung := *maxNoAnggota
+		noAnggotaTerakhir := noAnggotaTerakhirTampung[len(noAnggotaTerakhirTampung)-3:]
+		noAnggotaTerakhirInt, err := strconv.Atoi(noAnggotaTerakhir)
+		if err != nil {
+			log.Println(err)
+		}
+		return fmt.Sprintf("A%03d", noAnggotaTerakhirInt+1), nil
 	}
-	noAnggotaTerakhir := maxNoAnggota[len(maxNoAnggota)-3:]
-	noAnggotaTerakhirInt, err := strconv.Atoi(noAnggotaTerakhir)
-	if err != nil {
-		log.Println(err)
-	}
-	return fmt.Sprintf("A%03d", noAnggotaTerakhirInt+1), nil
+	return "", fmt.Errorf("error")
 }
 func (b *anggotaService) GetAnggotaByQuery(noAnggota string) (*ResponseAnggota, error) {
 	anggotaRepo := b.repo.GetAnggotaByNoAnggota(noAnggota)

@@ -31,7 +31,7 @@ func (r *repository) Create(anggota *model.Anggota) (sql.Result, error) {
 }
 
 func (r *repository) GetAll() (*sql.Rows, error) {
-	return r.db.Query("select * from anggota")
+	return r.db.Query("select a.id, a.no_anggota,a.nama,a.alumni,k.klasifikasi_anggota_id as klasifikasi_anggota_id from anggota as a inner join klasifikasi_anggota_hub as k on a.id=k.anggota_id;")
 }
 
 func (r *repository) Update(anggota *model.Anggota) error {

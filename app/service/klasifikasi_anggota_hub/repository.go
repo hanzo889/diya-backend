@@ -7,6 +7,8 @@ import (
 
 type Repository interface {
 	Create(kah *model.KlasifikasiAnggotaHub) error
+	Delete(anggotaId int) error
+	Update(klasifikasiAnggotaId int, anggotaId int) error
 }
 
 type repository struct {
@@ -22,3 +24,12 @@ func (r *repository) Create(kah *model.KlasifikasiAnggotaHub) error {
 	return err
 }
 
+func (r *repository) Delete(anggotaId int) error {
+	_, err := r.db.Exec("delete from klasifikasi_anggota_hub where anggota_id=?", anggotaId)
+	return err
+}
+
+func (r *repository) Update(klasifikasiAnggotaId int, anggotaId int) error {
+	_, err := r.db.Exec("update klasifikasi_anggota_hub set klasifikasi_anggota_id=? where anggota_id=?", klasifikasiAnggotaId, anggotaId)
+	return err
+}
