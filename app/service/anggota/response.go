@@ -1,8 +1,9 @@
 package anggota
 
 type ResponseAnggota struct {
-	Id        int    `json:"id"`
-	NoAnggota string `json:"no_anggota"`
-	Nama      string `json:"nama"`
-	Alumni bool `json:"alumni"`
+	Id                   int    `json:"id"`
+	NoAnggota            string `json:"no_anggota"`
+	Nama                 string `json:"nama"`
+	Alumni               bool   `json:"alumni"`
+	KlasifikasiAnggotaId int    `json:"klasifikasi_anggota_id"`
 }

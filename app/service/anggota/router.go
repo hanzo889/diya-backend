@@ -2,6 +2,7 @@ package anggota
 
 import (
 	"database/sql"
+	klasifikasianggotahub "library/app/service/klasifikasi_anggota_hub"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -9,8 +10,8 @@ import (
 
 func Router(g *gin.RouterGroup, db *sql.DB) {
 	repo := NewRepository(db)
-
-	service := NewService(repo)
+	repoKlasifikasiAnggotaHub := klasifikasianggotahub.NewRepository(db)
+	service := NewService(repo, repoKlasifikasiAnggotaHub)
 
 	anggota := g.Group("/anggota")
 	anggota.GET("", func(ctx *gin.Context) {
@@ -37,7 +38,7 @@ func Router(g *gin.RouterGroup, db *sql.DB) {
 			ctx.JSON(400, gin.H{"message": "error bree"})
 		}
 
-		status,massage:=service.CreateAnggota(*request)
+		status, massage := service.CreateAnggota(*request)
 		ctx.JSON(status, gin.H{
 			"message": massage,
 		})
@@ -55,14 +56,14 @@ func Router(g *gin.RouterGroup, db *sql.DB) {
 
 		service.Update(request, id)
 	})
-	anggota.GET("/search",func(ctx *gin.Context) {
-		nama:=ctx.Query("q")
-		anggota,err:=service.GetAnggotaByQuery(nama)
-		if err!=nil {
-			ctx.JSON(400,gin.H{"message":"bad request"})
-			return 
+	anggota.GET("/search", func(ctx *gin.Context) {
+		nama := ctx.Query("q")
+		anggota, err := service.GetAnggotaByQuery(nama)
+		if err != nil {
+			ctx.JSON(400, gin.H{"message": "bad request"})
+			return
 		}
-		ctx.JSON(200,anggota)
+		ctx.JSON(200, anggota)
 	})
 
 }

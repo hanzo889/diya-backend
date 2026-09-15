@@ -1,8 +1,8 @@
 package model
 
-type Anggota struct{
-	ID int
+type Anggota struct {
+	ID        int
 	NoAnggota string
-	Nama string
-	Alumni bool
+	Nama      string
+	Alumni    bool
 }

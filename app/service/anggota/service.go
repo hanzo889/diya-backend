@@ -3,6 +3,7 @@ package anggota
 import (
 	"fmt"
 	"library/app/model"
+	klasifikasianggotahub "library/app/service/klasifikasi_anggota_hub"
 	"log"
 	"strconv"
 )
@@ -18,11 +19,12 @@ type Anggota interface {
 }
 
 type anggotaService struct {
-	repo Repository
+	repo                      Repository
+	repoKlasifikasiAnggotaHub klasifikasianggotahub.Repository
 }
 
-func NewService(repo Repository) Anggota {
-	return &anggotaService{repo}
+func NewService(repo Repository, repoKah klasifikasianggotahub.Repository) Anggota {
+	return &anggotaService{repo, repoKah}
 }
 
 func (b *anggotaService) CreateAnggota(anggotaRequest CreateRequest) (int, string) {
@@ -35,7 +37,13 @@ func (b *anggotaService) CreateAnggota(anggotaRequest CreateRequest) (int, strin
 		Nama:      anggotaRequest.Nama,
 		Alumni:    anggotaRequest.Alumni,
 	}
-	err = b.repo.Create(&anggota)
+	data, err := b.repo.Create(&anggota)
+	lastId, err := data.LastInsertId()
+	fmt.Println(data.LastInsertId())
+	if err != nil {
+		return 405, "not allowed"
+	}
+	err = b.repoKlasifikasiAnggotaHub.Create(&model.KlasifikasiAnggotaHub{AnggotaId: int(lastId), KlasifikasiAnggotaId: anggotaRequest.KlasifikasiAnggotaId})
 	if err != nil {
 		return 405, "not allowed"
 	}

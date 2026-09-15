@@ -19,7 +19,8 @@ Content-Type: application/json
 {
     
     "nama":"iiii",
-    "alumni":false
+    "alumni":false,
+    "klasifikasi_anggota_id": 1
 }
 ###
 POST {{host}}/api/petugas

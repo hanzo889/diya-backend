@@ -45,3 +45,7 @@ func (r *repository) Delete(id int) error {
 func (r *repository) GetById(id int) *sql.Row {
 	return r.db.QueryRow("select * from pinjaman where id=?", id)
 }
+
+// func (r *repository) GetAnggotaAndRole(noAnggota string) *sql.Row{
+// 	return 
+// }
