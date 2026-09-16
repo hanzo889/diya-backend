@@ -13,6 +13,7 @@ type Repository interface {
 	GetById(id int) *sql.Row
 	GetMaxNoAnggota() *sql.Row
 	GetAnggotaByNoAnggota(noAnggota string) *sql.Row
+	GetAnggotaKlasifikasi(noAnggota string) *sql.Row
 }
 
 type repository struct {
@@ -52,4 +53,7 @@ func (r *repository) GetMaxNoAnggota() *sql.Row {
 }
 func (r *repository) GetAnggotaByNoAnggota(noAnggota string) *sql.Row {
 	return r.db.QueryRow("select * from anggota where no_anggota=?", noAnggota)
+}
+func (r *repository) GetAnggotaKlasifikasi(noAnggota string) *sql.Row {
+	return r.db.QueryRow("select a.id,a.no_anggota,a.nama, k.maks_buku,k.maks_hari from anggota as a inner join klasifikasi_anggota_hub as kah on a.id=anggota_id inner join klasifikasi_anggota as k on k.id=kah.klasifikasi_anggota_id where a.no_anggota=?",noAnggota)
 }

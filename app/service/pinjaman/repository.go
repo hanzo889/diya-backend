@@ -2,6 +2,7 @@ package pinjaman
 
 import (
 	"database/sql"
+	"fmt"
 	"library/app/model"
 )
 
@@ -11,6 +12,7 @@ type Repository interface {
 	Update(pinjaman *model.Pinjaman) error
 	Delete(id int) error
 	GetById(id int) *sql.Row
+	GetBukuPinjamanByAnggotaId(id int) *sql.Rows
 }
 
 type repository struct {
@@ -45,7 +47,8 @@ func (r *repository) Delete(id int) error {
 func (r *repository) GetById(id int) *sql.Row {
 	return r.db.QueryRow("select * from pinjaman where id=?", id)
 }
-
-// func (r *repository) GetAnggotaAndRole(noAnggota string) *sql.Row{
-// 	return 
-// }
+func (r *repository) GetBukuPinjamanByAnggotaId(id int) *sql.Rows {
+	data, err := r.db.Query("select p.id,b.judul,p.tgl_pinjam from buku as b inner join pinjaman as p on p.buku_id=b.id where p.anggota_id=?", id)
+	fmt.Println(err)
+	return data
+}
