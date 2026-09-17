@@ -36,7 +36,6 @@ func (b *anggotaService) CreateAnggota(anggotaRequest CreateRequest) (int, strin
 		return 405, "not allowed 1"
 
 	}
-
 	anggota := model.Anggota{
 		NoAnggota: getMaxNoAnggota,
 		Nama:      anggotaRequest.Nama,
@@ -44,7 +43,6 @@ func (b *anggotaService) CreateAnggota(anggotaRequest CreateRequest) (int, strin
 	}
 	data, err := b.repo.Create(&anggota)
 	lastId, err := data.LastInsertId()
-	fmt.Println(data.LastInsertId())
 	if err != nil {
 		fmt.Println("--- 2 ---")
 		return 405, "not allowed 2"

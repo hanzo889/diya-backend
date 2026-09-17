@@ -11,6 +11,7 @@ type Repository interface {
 	Update(buku *model.Buku) error
 	Delete(id int) error
 	GetById(id int) *sql.Row
+	GetBukuByBarcode(barcode string) *sql.Row
 }
 
 type repository struct {
@@ -44,4 +45,8 @@ func (r *repository) Delete(id int) error {
 
 func (r *repository) GetById(id int) *sql.Row {
 	return r.db.QueryRow("select * from buku where id=?", id)
+}
+
+func (r *repository) GetBukuByBarcode(barcode string) *sql.Row {
+	return r.db.QueryRow("select b.id, b.judul from buku as b inner join buku_hub as bh on b.id=bh.buku_id where barcode=?", barcode)
 }

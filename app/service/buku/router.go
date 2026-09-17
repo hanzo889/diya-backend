@@ -2,6 +2,7 @@ package buku
 
 import (
 	"database/sql"
+	listkategori "library/app/service/list_kategori"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -9,8 +10,9 @@ import (
 
 func Router(g *gin.RouterGroup, db *sql.DB) {
 	repo := NewRepository(db)
+	repoListKategori := listkategori.NewRepository(db)
 
-	service := NewService(repo)
+	service := NewService(repo,repoListKategori)
 
 	buku := g.Group("/buku")
 	buku.GET("", func(ctx *gin.Context) {
@@ -52,8 +54,8 @@ func Router(g *gin.RouterGroup, db *sql.DB) {
 		if err != nil {
 			ctx.JSON(400, gin.H{"message": "error bree"})
 		}
-		
-		service.Update(request,id)
+
+		service.Update(request, id)
 	})
 
 }

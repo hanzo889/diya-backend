@@ -24,24 +24,24 @@ func NewRepository(db *sql.DB) Repository {
 }
 
 func (r *repository) Create(listKategori *model.ListKategori) error {
-	_, err := r.db.Exec("insert into list_katagori(kondisi) values(?)", listKategori.Kategori)
+	_, err := r.db.Exec("insert into list_kategori(kategori) values(?)", listKategori.Kategori)
 	return err
 }
 
 func (r *repository) GetAll() (*sql.Rows, error) {
-	return r.db.Query("select * from list_katagori")
+	return r.db.Query("select * from list_kategori")
 }
 
-func (r *repository) Update(list_katagori *model.ListKategori) error {
-	_, err := r.db.Exec("update list_katagori set kondisi=? where id=?", list_katagori.Kategori, list_katagori.Id)
+func (r *repository) Update(list_kategori *model.ListKategori) error {
+	_, err := r.db.Exec("update list_kategori set kategori=? where id=?", list_kategori.Kategori, list_kategori.Id)
 	return err
 }
 
 func (r *repository) Delete(id int) error {
-	_, err := r.db.Exec("delete from list_kondisi where id=?", id)
+	_, err := r.db.Exec("delete from list_kategori where id=?", id)
 	return err
 }
 
 func (r *repository) GetById(id int) *sql.Row {
-	return r.db.QueryRow("select * from list_kondisi where id=?", id)
+	return r.db.QueryRow("select * from list_kategori where id=?", id)
 }

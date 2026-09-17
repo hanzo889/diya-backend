@@ -11,7 +11,7 @@ GET {{host}}/api/buku
 ###
 GET {{host}}/api/buku/5
 ###
-DELETE {{host}}/api/buku/6
+DELETE {{host}}/api/buku/7
 ###
 POST {{host}}/api/anggota
 Content-Type: application/json
@@ -30,13 +30,14 @@ Content-Type: application/json
     "anggota_id":8,
 }
 ###
-PUT {{host}}/api/buku/8
+POST {{host}}/api/buku
 Content-Type: application/json
 
 {
     "judul":"bulan",
     "list_kategori_id":2,
-    "stock":400
+    "stock":400,
+    "penulis": "tes"
 }
 ###
 PUT {{host}}/api/petugas/1

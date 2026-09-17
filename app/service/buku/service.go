@@ -3,37 +3,49 @@ package buku
 import (
 	"fmt"
 	"library/app/model"
+	listkategori "library/app/service/list_kategori"
 	"log"
 )
 
 type Buku interface {
 	Get() []ResponseBuku
-	CreateBuku(bukuRequest CreateRequest)error
+	CreateBuku(bukuRequest CreateRequest) (int, string)
 	Update(bukuRequest *CreateRequest, id int)
 	Delete(id int)
 	GetById(id int) *ResponseBuku
 }
 
 type bukuService struct {
-	repo Repository
+	repo             Repository
+	repoListKategori listkategori.Repository
 }
 
-func NewService(repo Repository) Buku {
-	return &bukuService{repo}
+func NewService(repo Repository, repoListKategori listkategori.Repository) Buku {
+	return &bukuService{repo, repoListKategori}
 }
 
-func (b *bukuService) CreateBuku(bukuRequest CreateRequest) error{
-	buku := &model.Buku{
+func (b *bukuService) CreateBuku(bukuRequest CreateRequest) (int, string) {
+	// getListKategori, err := b.repoListKategori.GetAll()
+	// if err != nil {
+	// 	return 405, "not allowed"
+	// }
+	// var listKategori ResponseListKategori
+	// if err := getListKategori.Scan(&listKategori.Id, &listKategori.Kategori); err != nil {
+	// 	return 405, "not allowed"
+	// }
+	buku := model.Buku{
 		Judul:          bukuRequest.Judul,
 		ListKategoriId: bukuRequest.ListKategoriId,
 		Stock:          bukuRequest.Stock,
 		Penulis:        bukuRequest.Penulis,
 	}
-	err := b.repo.Create(buku)
+	err := b.repo.Create(&buku)
+	// err = b.repoListKategori.Create(&model.ListKategori{Kategori: listKategori.Kategori})
 	if err != nil {
-		log.Println("***",err)
+		return 405, "not allowed"
 	}
-return err
+
+	return 200, "created"
 }
 func (b *bukuService) Get() []ResponseBuku {
 	var bukuBuku []ResponseBuku
@@ -47,9 +59,9 @@ func (b *bukuService) Get() []ResponseBuku {
 	for bukuBukuRepo.Next() {
 
 		var buku ResponseBuku
-		fmt.Println(bukuBukuRepo)
+		fmt.Println("ini buku repo", bukuBukuRepo)
 		if err := bukuBukuRepo.Scan(&buku.Id, &buku.Judul, &buku.ListKategoriId, &buku.Stock, &buku.Penulis); err != nil {
-			
+
 			return bukuBuku
 		}
 		bukuBuku = append(bukuBuku, buku)
