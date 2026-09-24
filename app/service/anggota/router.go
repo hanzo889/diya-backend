@@ -19,11 +19,8 @@ func Router(g *gin.RouterGroup, db *sql.DB) {
 	})
 
 	anggota.GET("/:id", func(ctx *gin.Context) {
-
 		id, _ := strconv.Atoi(ctx.Param("id"))
-
 		ctx.JSON(200, service.GetById(id))
-
 	})
 	anggota.DELETE("/:id", func(ctx *gin.Context) {
 		id, _ := strconv.Atoi(ctx.Param("id"))
@@ -37,14 +34,11 @@ func Router(g *gin.RouterGroup, db *sql.DB) {
 		if err != nil {
 			ctx.JSON(400, gin.H{"message": "error bree"})
 		}
-
 		status, massage := service.CreateAnggota(*request)
 		ctx.JSON(status, gin.H{
 			"message": massage,
 		})
-
 	})
-
 	anggota.PUT("/:id", func(ctx *gin.Context) {
 		id, _ := strconv.Atoi(ctx.Param("id"))
 

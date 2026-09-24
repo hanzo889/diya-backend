@@ -6,11 +6,12 @@ import (
 )
 
 type Repository interface {
-	Create(bukuhub *model.BukuHub) error
+	Create(bukuhub *model.BukuHub)  error
 	GetAll() (*sql.Rows, error)
 	Update(bukuhub *model.BukuHub) error
 	Delete(id int) error
 	GetById(id int) *sql.Row
+	GetMaxBarcode() *sql.Row
 }
 
 type repository struct {
@@ -25,7 +26,7 @@ func NewRepository(db *sql.DB) Repository {
 
 func (r *repository) Create(bukuhub *model.BukuHub) error {
 	_, err := r.db.Exec("insert into buku_hub (barcode,buku_id,list_kondisi_id,anggota_id,rak_id) values(?,?,?,?,?)", bukuhub.Barcode, bukuhub.BukuId, bukuhub.ListKondisiId, bukuhub.AnggotaId, bukuhub.RakId)
-	return err
+	return  err
 }
 
 func (r *repository) GetAll() (*sql.Rows, error) {
@@ -45,3 +46,7 @@ func (r *repository) Delete(id int) error {
 func (r *repository) GetById(id int) *sql.Row {
 	return r.db.QueryRow("select * from buku_hub where id=?", id)
 }
+func (r *repository) GetMaxBarcode() *sql.Row {
+	return r.db.QueryRow("select max(barcode) from buku_hub")
+}
+

@@ -5,6 +5,6 @@ type BukuHub struct{
 	Barcode string
 	BukuId int
 	ListKondisiId int
-	AnggotaId int
+	AnggotaId *int
 	RakId int
 }

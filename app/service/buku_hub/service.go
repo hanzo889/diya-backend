@@ -1,91 +1,103 @@
 package bukuhub
 
-import (
-	"library/app/model"
-	"log"
-)
+// import (
+// 	"library/app/model"
+// 	"library/app/service/buku"
+// 	"log"
+// )
 
-type BukuHub interface {
-	Get() []responseBukuHub
-	CreateBukuHub(bukuHubRequest CreateRequest) (int, string)
-	Update(bukuRequest *CreateRequest, id int)
-	Delete(id int)
-	GetById(id int) *responseBukuHub
-}
+// type BukuHub interface {
+// 	Get() []responseBukuHub
+// 	CreateBukuHub(bukuHubRequest CreateRequest, bukuId int, anggotaId int) (int, string)
+// 	Update(bukuRequest *CreateRequest, id int)
+// 	Delete(id int)
+// 	GetById(id int) *responseBukuHub
+// }
 
-type bukuHubService struct {
-	repo Repository
-}
+// type bukuHubService struct {
+// 	repo Repository
+// }
 
-var data []model.BukuHub
+// func NewService(repo Repository) BukuHub {
+// 	return &bukuHubService{repo}
+// }
 
-func NewService(repo Repository) BukuHub {
-	return &bukuHubService{repo}
-}
+// func (b *bukuHubService) CreateBukuHub(bukuHubRequest CreateRequest, bukuId int, anggotaId int) (int, string) {
+// 	dataBuku := b.interfaceBuku.GetById(bukuId)
+// 	dataAnggota := b.interfaceAnggota.GetById(anggotaId)
+// 	getMaxBarcode, err := b.GetMaxBarcode()
+// 	if err != nil {
+// 		return 405, "not allowed"
+// 	}
 
-func (b *bukuHubService) CreateBukuHub(bukuHubRequest CreateRequest) (int, string) {
-	bukuhub := &model.BukuHub{
-		Barcode:       bukuHubRequest.Barcode,
-		BukuId:        bukuHubRequest.BukuId,
-		ListKondisiId: bukuHubRequest.ListKondisiId,
-		AnggotaId:     bukuHubRequest.AnggotaId,
-		RakId:         bukuHubRequest.RakId,
-	}
-	err := b.repo.Create(bukuhub)
-	if err != nil {
-		log.Println(err)
-		return 405, "not allowed"
-	}
-	return 200, "created"
+// 	bukuhub := model.BukuHub{
+// 		Barcode:       getMaxBarcode,
+// 		BukuId:        dataBuku.Id,
+// 		ListKondisiId: bukuHubRequest.ListKondisiId,
+// 		AnggotaId:     &dataAnggota.Id,
+// 		RakId:         bukuHubRequest.RakId,
+// 	}
+// 	err = b.repo.Create(&bukuhub)
 
-}
-func (b *bukuHubService) Get() []responseBukuHub {
-	var bukuBukuHub []responseBukuHub
-	bukuBukuHubRepo, err := b.repo.GetAll()
+// 	if err != nil {
+// 		log.Println(err)
+// 		return 405, "not allowed"
+// 	}
+// 	dataBuku.Stock++
+// 	b.interfaceBuku.Update(&buku.CreateRequest{
+// 		Stock: dataBuku.Stock,
+// 	}, bukuId)
 
-	if err != nil {
-		log.Println(err)
-		return bukuBukuHub
-	}
-	// log.Println(bukuBukuHubRepo)
-	for bukuBukuHubRepo.Next() {
+// 	return 200, "created"
 
-		var bukuhub responseBukuHub
-		if err := bukuBukuHubRepo.Scan(&bukuhub.Id, &bukuhub.Barcode, &bukuhub.BukuId, &bukuhub.ListKondisiId, &bukuhub.AnggotaId, &bukuhub.RakId); err != nil {
-			return bukuBukuHub
-		}
-		bukuBukuHub = append(bukuBukuHub, bukuhub)
-	}
-	return bukuBukuHub
-}
+// }
+// func (b *bukuHubService) Get() []responseBukuHub {
+// 	var bukuBukuHub []responseBukuHub
+// 	bukuBukuHubRepo, err := b.repo.GetAll()
 
-func (b *bukuHubService) Update(bukuHubRequest *CreateRequest, id int) {
-	bukuhub := &model.BukuHub{
-		ID:            id,
-		Barcode:       bukuHubRequest.Barcode,
-		BukuId:        bukuHubRequest.BukuId,
-		ListKondisiId: bukuHubRequest.ListKondisiId,
-		AnggotaId:     bukuHubRequest.AnggotaId,
-		RakId:         bukuHubRequest.RakId,
-	}
-	err := b.repo.Update(bukuhub)
-	if err != nil {
-		log.Println(err)
-	}
-}
+// 	if err != nil {
+// 		log.Println(err)
+// 		return bukuBukuHub
+// 	}
+// 	// log.Println(bukuBukuHubRepo)
+// 	for bukuBukuHubRepo.Next() {
 
-func (b *bukuHubService) Delete(id int) {
-	if err := b.repo.Delete(id); err != nil {
-		log.Println(err)
-	}
-}
+// 		var bukuhub responseBukuHub
+// 		if err := bukuBukuHubRepo.Scan(&bukuhub.Id, &bukuhub.Barcode, &bukuhub.BukuId, &bukuhub.ListKondisiId, &bukuhub.AnggotaId, &bukuhub.RakId); err != nil {
+// 			return bukuBukuHub
+// 		}
+// 		bukuBukuHub = append(bukuBukuHub, bukuhub)
+// 	}
+// 	return bukuBukuHub
+// }
 
-func (b *bukuHubService) GetById(id int) *responseBukuHub {
-	barisBukuHub := b.repo.GetById(id)
+// func (b *bukuHubService) Update(bukuHubRequest *CreateRequest, id int) {
+// 	bukuhub := &model.BukuHub{
+// 		ID:            id,
+// 		Barcode:       bukuHubRequest.Barcode,
+// 		BukuId:        bukuHubRequest.BukuId,
+// 		ListKondisiId: bukuHubRequest.ListKondisiId,
+// 		AnggotaId:     nil,
+// 		RakId:         bukuHubRequest.RakId,
+// 	}
+// 	err := b.repo.Update(bukuhub)
+// 	if err != nil {
+// 		log.Println(err)
+// 	}
+// }
 
-	var bukuhub responseBukuHub
-	if err := barisBukuHub.Scan(&bukuhub.Id, &bukuhub.Barcode, &bukuhub.BukuId, &bukuhub.ListKondisiId, &bukuhub.AnggotaId, &bukuhub.RakId); err != nil {
-		log.Println(err)
-	}
-	return &bukuhub
-}
+// func (b *bukuHubService) Delete(id int) {
+// 	if err := b.repo.Delete(id); err != nil {
+// 		log.Println(err)
+// 	}
+// }
+
+// func (b *bukuHubService) GetById(id int) *responseBukuHub {
+// 	barisBukuHub := b.repo.GetById(id)
+
+// 	var bukuhub responseBukuHub
+// 	if err := barisBukuHub.Scan(&bukuhub.Id, &bukuhub.Barcode, &bukuhub.BukuId, &bukuhub.ListKondisiId, &bukuhub.AnggotaId, &bukuhub.RakId); err != nil {
+// 		log.Println(err)
+// 	}
+// 	return &bukuhub
+// }

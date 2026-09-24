@@ -3,7 +3,7 @@ package app
 import (
 	"library/app/service/anggota"
 	"library/app/service/buku"
-	bukuhub "library/app/service/buku_hub"
+	// bukuhub "library/app/service/buku_hub"
 	"library/app/service/denda"
 	hargabuku "library/app/service/harga_buku"
 	klasifikasianggota "library/app/service/klasifikasi_anggota"
@@ -34,7 +34,7 @@ func Run() {
 	api := router.Group("/api")
 
 	buku.Router(api, db,)
-	bukuhub.Router(api, db)
+	// bukuhub.Router(api, db)
 	denda.Router(api, db)
 	hargabuku.Router(api, db)
 	rak.Router(api, db)

@@ -101,4 +101,11 @@ Content-Type: application/json
     "rak_id":1
 }
 
+###
+PUT {{host}}/api/17/A001
+Content-Type: application/json
 
+{
+  "list_kondisi_id":1,
+  "rak_id":1
+}

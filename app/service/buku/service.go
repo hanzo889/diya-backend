@@ -1,10 +1,13 @@
 package buku
 
 import (
-
+	"fmt"
 	"library/app/model"
+	"library/app/service/anggota"
+	bukuhub "library/app/service/buku_hub"
 	listkategori "library/app/service/list_kategori"
 	"log"
+	"strconv"
 )
 
 type Buku interface {
@@ -13,35 +16,29 @@ type Buku interface {
 	Update(bukuRequest *CreateRequest, id int)
 	Delete(id int)
 	GetById(id int) *ResponseBuku
-	GetBukuByBarcode(barcode string) (*ResponseBuku,error)
+	GetBukuByBarcode(barcode string) (*ResponseBuku, error)
+	CreateBarcode(bukuHubRequest bukuhub.CreateRequest, bukuId int, noAnggota string) (int, error)
+	GetMaxBarcode() (string, error)
 }
 
 type bukuService struct {
 	repo             Repository
 	repoListKategori listkategori.Repository
+	repoAnggota      anggota.Repository
+	repoBukuHub      bukuhub.Repository
 }
 
-func NewService(repo Repository, repoListKategori listkategori.Repository) Buku {
-	return &bukuService{repo, repoListKategori}
+func NewService(repo Repository, repoListKategori listkategori.Repository, repoAnggota anggota.Repository, repoBukuHub bukuhub.Repository) Buku {
+	return &bukuService{repo, repoListKategori, repoAnggota, repoBukuHub}
 }
 
 func (b *bukuService) CreateBuku(bukuRequest CreateRequest) (int, string) {
-	// getListKategori, err := b.repoListKategori.GetAll()
-	// if err != nil {
-	// 	return 405, "not allowed"
-	// }
-	// var listKategori ResponseListKategori
-	// if err := getListKategori.Scan(&listKategori.Id, &listKategori.Kategori); err != nil {
-	// 	return 405, "not allowed"
-	// }
 	buku := model.Buku{
 		Judul:          bukuRequest.Judul,
 		ListKategoriId: bukuRequest.ListKategoriId,
-		Stock:          bukuRequest.Stock,
 		Penulis:        bukuRequest.Penulis,
 	}
 	err := b.repo.Create(&buku)
-	// err = b.repoListKategori.Create(&model.ListKategori{Kategori: listKategori.Kategori})
 	if err != nil {
 		return 405, "not allowed"
 	}
@@ -99,11 +96,65 @@ func (b *bukuService) GetById(id int) *ResponseBuku {
 	return &buku
 }
 
-func (b *bukuService)GetBukuByBarcode(barcode string) (*ResponseBuku,error){
-	bukuRepo:=b.repo.GetBukuByBarcode(barcode)
+func (b *bukuService) GetBukuByBarcode(barcode string) (*ResponseBuku, error) {
+	bukuRepo := b.repo.GetBukuByBarcode(barcode)
 	var buku ResponseBuku
-	if err:=bukuRepo.Scan(&buku.Id,&buku.Judul);err!=nil{
-		return nil,err
+	if err := bukuRepo.Scan(&buku.Id, &buku.Judul); err != nil {
+		return nil, err
 	}
-	return &buku,nil
+	return &buku, nil
+}
+func (b *bukuService) CreateBarcode(bukuHubRequest bukuhub.CreateRequest, bukuId int, noAnggota string) (int, error) {
+	dataBuku := b.GetById(bukuId)
+	dataAnggota := b.repoAnggota.GetAnggotaByNoAnggota(noAnggota)
+	getMaxBarcode, err := b.GetMaxBarcode()
+
+	if err != nil {
+		return 405, err
+	}
+	var tampungDataAnggota model.Anggota
+	if err := dataAnggota.Scan(&tampungDataAnggota.ID, &tampungDataAnggota.NoAnggota, &tampungDataAnggota.Nama, &tampungDataAnggota.Alumni); err != nil {
+		return 405, err
+	}
+	bukuhub := model.BukuHub{
+		Barcode:       getMaxBarcode,
+		BukuId:        dataBuku.Id,
+		ListKondisiId: bukuHubRequest.ListKondisiId,
+		AnggotaId:     &tampungDataAnggota.ID,
+		RakId:         bukuHubRequest.RakId,
+	}
+
+	err = b.repoBukuHub.Create(&bukuhub)
+
+	if err != nil {
+		log.Println(err)
+		return 405, err
+	}
+	dataBuku.Stock++
+	b.Update(&CreateRequest{
+		Stock: dataBuku.Stock,
+	}, bukuId)
+
+	return 200, err
+
+}
+func (b *bukuService) GetMaxBarcode() (string, error) {
+	barcode := b.repoBukuHub.GetMaxBarcode()
+	var maxBarcode *string
+
+	if err := barcode.Scan(&maxBarcode); err != nil {
+		return "", err
+	}
+	if maxBarcode == nil {
+		return "B001", nil
+	} else if maxBarcode != nil {
+		maxBarcodeTerakhirTampung := *maxBarcode
+		barcodeTerakhir := maxBarcodeTerakhirTampung[len(maxBarcodeTerakhirTampung)-3:]
+		barcodeTerakhirInt, err := strconv.Atoi(barcodeTerakhir)
+		if err != nil {
+			log.Println(err)
+		}
+		return fmt.Sprintf("B%03d", barcodeTerakhirInt+1), nil
+	}
+	return "", fmt.Errorf("error")
 }

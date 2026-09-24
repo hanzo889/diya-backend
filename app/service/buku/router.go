@@ -3,6 +3,8 @@ package buku
 import (
 	"database/sql"
 	"fmt"
+	"library/app/service/anggota"
+	bukuhub "library/app/service/buku_hub"
 	listkategori "library/app/service/list_kategori"
 	"strconv"
 
@@ -12,8 +14,10 @@ import (
 func Router(g *gin.RouterGroup, db *sql.DB) {
 	repo := NewRepository(db)
 	repoListKategori := listkategori.NewRepository(db)
+	repoAnggota := anggota.NewRepository(db)
+	repoBukuHub := bukuhub.NewRepository(db)
 
-	service := NewService(repo,repoListKategori)
+	service := NewService(repo, repoListKategori, repoAnggota, repoBukuHub)
 
 	buku := g.Group("/buku")
 	buku.GET("", func(ctx *gin.Context) {
@@ -58,7 +62,7 @@ func Router(g *gin.RouterGroup, db *sql.DB) {
 
 		service.Update(request, id)
 	})
-		buku.GET("/search", func(ctx *gin.Context) {
+	buku.GET("/search", func(ctx *gin.Context) {
 		barcode := ctx.Query("q")
 		buku, err := service.GetBukuByBarcode(barcode)
 		if err != nil {
@@ -67,6 +71,29 @@ func Router(g *gin.RouterGroup, db *sql.DB) {
 			return
 		}
 		ctx.JSON(200, buku)
+	})
+	buku.PUT("/:id/:noAnggota", func(ctx *gin.Context) {
+		noAnggota := ctx.Param("noAnggota")
+
+		id, err := strconv.Atoi(ctx.Param("id"))
+		if err != nil {
+			ctx.JSON(400, gin.H{"message": "id tidak valid"})
+			return
+		}
+
+		var request bukuhub.CreateRequest
+		if err := ctx.BindJSON(&request); err != nil {
+			ctx.JSON(400, gin.H{"message": "error update buku & create bukuHub"})
+			fmt.Println("bind error:", err)
+			return
+		}
+
+		if status, err := service.CreateBarcode(request, id, noAnggota); err != nil {
+			ctx.JSON(status, gin.H{"message": "gagal membuat barcode", "error": err.Error()})
+			return
+		}
+
+		ctx.JSON(200, gin.H{"message": "berhasil update buku & create bukuHub"})
 	})
 
 }
