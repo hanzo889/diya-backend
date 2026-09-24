@@ -2,6 +2,7 @@ package buku
 
 import (
 	"database/sql"
+	"fmt"
 	listkategori "library/app/service/list_kategori"
 	"strconv"
 
@@ -56,6 +57,16 @@ func Router(g *gin.RouterGroup, db *sql.DB) {
 		}
 
 		service.Update(request, id)
+	})
+		buku.GET("/search", func(ctx *gin.Context) {
+		barcode := ctx.Query("q")
+		buku, err := service.GetBukuByBarcode(barcode)
+		if err != nil {
+			fmt.Println(err)
+			ctx.JSON(400, gin.H{"message": "bad request"})
+			return
+		}
+		ctx.JSON(200, buku)
 	})
 
 }

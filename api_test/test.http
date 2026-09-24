@@ -11,16 +11,21 @@ GET {{host}}/api/buku
 ###
 GET {{host}}/api/buku/5
 ###
-DELETE {{host}}/api/buku/7
+DELETE {{host}}/api/anggota/29
 ###
-POST {{host}}/api/anggota
+POST {{host}}/api/pinjaman
 Content-Type: application/json
 
 {
     
-    "nama":"iiii",
-    "alumni":false,
-    "klasifikasi_anggota_id": 1
+    "anggota_id":45,
+    "buku_id":18,
+    
+    "petugas_pinjam_id":null,
+    "petugas_balik_id":null,
+    "kondisi_awal_id":1,
+    "kondisi_akhir_id":1,
+    "status":"dipinjam"
 }
 ###
 POST {{host}}/api/petugas
@@ -48,7 +53,7 @@ Content-Type: application/json
 }
 
 ###
-GET {{host}}/api/buku-hub
+GET {{host}}/api/buku/search?q=B003
 ###
 GET {{host}}/api/buku-hub/2
 ###
@@ -77,11 +82,23 @@ Content-Type: application/json
   "maks_hari": 3,
 }
 ###
-GET {{host}}/api/harga-buku
+GET {{host}}/api/buku-hub
 ###
 GET {{host}}/api/list-kondisi
 ###
 GET {{host}}/api/rak
 ###
-GET {{host}}/api/pinjaman/A009
+GET {{host}}/api/anggota/A009
+###
+POST  {{host}}/api/buku-hub
+Content-Type: application/json
+
+{
+    "barcode":"B003",
+    "buku_id":18,
+    "list_kondisi_id":1,
+    "anggota_id":29,
+    "rak_id":1
+}
+
 

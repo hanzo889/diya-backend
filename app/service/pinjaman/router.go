@@ -2,6 +2,7 @@ package pinjaman
 
 import (
 	"database/sql"
+	"fmt"
 	"library/app/service/anggota"
 
 	"github.com/gin-gonic/gin"
@@ -32,19 +33,21 @@ func Router(g *gin.RouterGroup, db *sql.DB) {
 	// 	ctx.JSON(200, gin.H{"message": "success"})
 	// })
 
-	// pinjaman.POST("", func(ctx *gin.Context) {
-	// 	var request *CreateRequest
-	// 	err := ctx.BindJSON(&request)
-	// 	if err != nil {
-	// 		ctx.JSON(400, gin.H{"message": "error bree"})
-	// 	}
+	pinjaman.POST("", func(ctx *gin.Context) {
+		var request CreateRequest
+		err := ctx.BindJSON(&request)
+		if err != nil {
+			fmt.Println(err)
+			ctx.JSON(400, gin.H{"message": "error bree"})
+			return
+		}
 
-	// 	service.CreatePinjaman(*request)
-	// 	ctx.JSON(200, gin.H{
-	// 		"message": "created",
-	// 	})
+		service.CreatePinjaman(request)
+		ctx.JSON(200, gin.H{
+			"message": "created",
+		})
 
-	// })
+	})
 
 	// pinjaman.PUT("/:id", func(ctx *gin.Context) {
 	// 	id, _ := strconv.Atoi(ctx.Param("id"))

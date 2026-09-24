@@ -4,15 +4,18 @@ import (
 	"fmt"
 	"library/app/model"
 	"library/app/service/anggota"
+	"log"
+	"time"
 )
 
 type Pinjaman interface {
 	// Get() []ResponsePinjaman
-	// CreatePinjaman(pinjamanRequest CreateRequest)
+	CreatePinjaman(pinjamanRequest CreateRequest) error
 	// Update(pinjamanRequest *CreateRequest, id int)
 	// Delete(id int)
 	// GetById(id int) *ResponsePinjaman
 	GetPinjamanByNoAnggota(noAnggota string) *ResponsePinjamanAnggota
+	getPinjaman(anggotaId int, bukuId int) error
 }
 
 type pinjamanService struct {
@@ -32,44 +35,73 @@ func (b *pinjamanService) GetPinjamanByNoAnggota(noAnggota string) *ResponsePinj
 	if err := anggotaData.Scan(&dataAnggota.Id, &dataAnggota.NoAnggota, &dataAnggota.Nama, &dataAnggota.MaksBuku, &dataAnggota.MaksHari); err != nil {
 		return &ResponsePinjamanAnggota{}
 	}
-	buku:=b.repo.GetBukuPinjamanByAnggotaId(dataAnggota.Id)
+	buku := b.repo.GetBukuPinjamanByAnggotaId(dataAnggota.Id)
 	var dataBuku []ResponseBuku
-	for buku.Next(){
+	for buku.Next() {
 		var bukuData ResponseBuku
-		if err:=buku.Scan(&bukuData.Id,&bukuData.Judul,&bukuData.TglPinjam);err!=nil{
+		if err := buku.Scan(&bukuData.Id, &bukuData.Judul, &bukuData.TglPinjam); err != nil {
 			fmt.Println(err)
 			return &ResponsePinjamanAnggota{}
 		}
 		dataBuku = append(dataBuku, bukuData)
 	}
-	bolehPinjam:=dataAnggota.MaksBuku>=len(dataBuku)
+	bolehPinjam := dataAnggota.MaksBuku >= len(dataBuku)
 	return &ResponsePinjamanAnggota{
-		Id: dataAnggota.Id,
-		NoAnggota : dataAnggota.NoAnggota,
-		Nama: dataAnggota.Nama,
+		Id:          dataAnggota.Id,
+		NoAnggota:   dataAnggota.NoAnggota,
+		Nama:        dataAnggota.Nama,
 		BolehPinjam: &bolehPinjam,
-		Buku: dataBuku,
+		Buku:        dataBuku,
 	}
 }
 
-// func (b *pinjamanService) CreatePinjaman(pinjamanRequest CreateRequest) {
-// 	pinjaman := &model.Pinjaman{
-// 		AnggotaId:       pinjamanRequest.AnggotaId,
-// 		BukuId:          pinjamanRequest.BukuId,
-// 		TglPinjam:       pinjamanRequest.TglPinjam,
-// 		TglBalik:        pinjamanRequest.TglBalik,
-// 		PetugasPinjamId: pinjamanRequest.PetugasPinjamId,
-// 		PetugasBalikId: pinjamanRequest.PetugasBalikId,
-// 		KondisiAwalId: pinjamanRequest.KondisiAwalId,
-// 		KondisiAkhirId: pinjamanRequest.KondisiAkhirId,
-// 		Status:          pinjamanRequest.Status,
-// 	}
-// 	err := b.repo.Create(pinjaman)
-// 	if err != nil {
-// 		log.Println(err)
-// 	}
+func (b *pinjamanService) getPinjaman(anggotaId int, bukuId int) error {
+	var tampungBuku []responseGetPinjamanByAnggotaId
+	dataPinjaman := b.repo.GetPinjamanByAnggotaId(anggotaId)
+	for dataPinjaman.Next() {
+		var p responseGetPinjamanByAnggotaId
+		if err := dataPinjaman.Scan(&p.AnggotaId, &p.BukuId, &p.MaksBuku); err != nil {
+			return err
+		}
+		tampungBuku = append(tampungBuku, p)
+	}
+	if len(tampungBuku) == 0 {
+		return nil
+	} else if len(tampungBuku) >= tampungBuku[0].MaksBuku {
+		return fmt.Errorf("melebihi batas pinjam buku!")
+	}
+	for _, buku := range tampungBuku {
+		if buku.BukuId == bukuId {
+			return fmt.Errorf("tidak boleh meminjam buku yang sama")
+		}
+	}
+	return nil
+}
 
-// }
+func (b *pinjamanService) CreatePinjaman(pinjamanRequest CreateRequest) error {
+	var err error
+	if err = b.getPinjaman(pinjamanRequest.AnggotaId, pinjamanRequest.BukuId); err == nil {
+		pinjaman := &model.Pinjaman{
+			AnggotaId:       pinjamanRequest.AnggotaId,
+			BukuId:          pinjamanRequest.BukuId,
+			TglPinjam:       time.Now(),
+			TglBalik:        nil,
+			PetugasPinjamId: pinjamanRequest.PetugasPinjamId,
+			PetugasBalikId:  pinjamanRequest.PetugasBalikId,
+			KondisiAwalId:   pinjamanRequest.KondisiAwalId,
+			KondisiAkhirId:  pinjamanRequest.KondisiAkhirId,
+			Status:          pinjamanRequest.Status,
+		}
+		err := b.repo.Create(pinjaman)
+		if err != nil {
+			log.Println(err)
+			return err
+		}
+		return err
+	}
+	return err
+}
+
 // func (b *pinjamanService) Get() []ResponsePinjaman {
 // 	var pinjamanpinjaman []ResponsePinjaman
 // 	pinjamanpinjamanRepo, err := b.repo.GetAll()
@@ -124,4 +156,3 @@ func (b *pinjamanService) GetPinjamanByNoAnggota(noAnggota string) *ResponsePinj
 //		}
 //		return &pinjaman
 //	}
-

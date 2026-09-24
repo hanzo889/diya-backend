@@ -1,7 +1,7 @@
 package buku
 
 import (
-	"fmt"
+
 	"library/app/model"
 	listkategori "library/app/service/list_kategori"
 	"log"
@@ -13,6 +13,7 @@ type Buku interface {
 	Update(bukuRequest *CreateRequest, id int)
 	Delete(id int)
 	GetById(id int) *ResponseBuku
+	GetBukuByBarcode(barcode string) (*ResponseBuku,error)
 }
 
 type bukuService struct {
@@ -59,7 +60,6 @@ func (b *bukuService) Get() []ResponseBuku {
 	for bukuBukuRepo.Next() {
 
 		var buku ResponseBuku
-		fmt.Println("ini buku repo", bukuBukuRepo)
 		if err := bukuBukuRepo.Scan(&buku.Id, &buku.Judul, &buku.ListKategoriId, &buku.Stock, &buku.Penulis); err != nil {
 
 			return bukuBuku
@@ -97,4 +97,13 @@ func (b *bukuService) GetById(id int) *ResponseBuku {
 		log.Println(err)
 	}
 	return &buku
+}
+
+func (b *bukuService)GetBukuByBarcode(barcode string) (*ResponseBuku,error){
+	bukuRepo:=b.repo.GetBukuByBarcode(barcode)
+	var buku ResponseBuku
+	if err:=bukuRepo.Scan(&buku.Id,&buku.Judul);err!=nil{
+		return nil,err
+	}
+	return &buku,nil
 }

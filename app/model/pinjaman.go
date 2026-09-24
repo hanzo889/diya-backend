@@ -7,10 +7,10 @@ type Pinjaman struct {
 	AnggotaId       int
 	BukuId          int
 	TglPinjam       time.Time
-	TglBalik        time.Time
-	PetugasPinjamId int
-	PetugasBalikId int
-	KondisiAwalId  int
-	KondisiAkhirId int
-	Status         string
+	TglBalik        *time.Time
+	PetugasPinjamId *int
+	PetugasBalikId  *int
+	KondisiAwalId   int
+	KondisiAkhirId  int
+	Status          string
 }

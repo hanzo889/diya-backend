@@ -7,7 +7,7 @@ import (
 
 type BukuHub interface {
 	Get() []responseBukuHub
-	CreateBukuHub(bukuHubRequest CreateRequest)
+	CreateBukuHub(bukuHubRequest CreateRequest) (int, string)
 	Update(bukuRequest *CreateRequest, id int)
 	Delete(id int)
 	GetById(id int) *responseBukuHub
@@ -23,10 +23,10 @@ func NewService(repo Repository) BukuHub {
 	return &bukuHubService{repo}
 }
 
-func (b *bukuHubService) CreateBukuHub(bukuHubRequest CreateRequest) {
+func (b *bukuHubService) CreateBukuHub(bukuHubRequest CreateRequest) (int, string) {
 	bukuhub := &model.BukuHub{
 		Barcode:       bukuHubRequest.Barcode,
-		BukuId:        bukuHubRequest.ListKondisiId,
+		BukuId:        bukuHubRequest.BukuId,
 		ListKondisiId: bukuHubRequest.ListKondisiId,
 		AnggotaId:     bukuHubRequest.AnggotaId,
 		RakId:         bukuHubRequest.RakId,
@@ -34,7 +34,9 @@ func (b *bukuHubService) CreateBukuHub(bukuHubRequest CreateRequest) {
 	err := b.repo.Create(bukuhub)
 	if err != nil {
 		log.Println(err)
+		return 405, "not allowed"
 	}
+	return 200, "created"
 
 }
 func (b *bukuHubService) Get() []responseBukuHub {

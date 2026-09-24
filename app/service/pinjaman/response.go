@@ -22,9 +22,8 @@ type TampungPinjamanAnggota struct {
 	MaksHari  int    `json:"maks_hari"`
 }
 type ResponseBuku struct {
-	Id    int    `json:"id"`
-	Judul string `json:"judul"`
-
+	Id        int       `json:"id"`
+	Judul     string    `json:"judul"`
 	TglPinjam time.Time `json:"tgl_pinjam"`
 }
 
@@ -34,4 +33,10 @@ type ResponsePinjamanAnggota struct {
 	Nama        string         `json:"nama"`
 	BolehPinjam *bool          `json:"boleh_pinjam"`
 	Buku        []ResponseBuku `json:"buku"`
+}
+
+type responseGetPinjamanByAnggotaId struct{
+	AnggotaId int
+	BukuId int
+	MaksBuku int
 }

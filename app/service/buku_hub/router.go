@@ -37,9 +37,9 @@ func Router(g *gin.RouterGroup, db *sql.DB) {
 			ctx.JSON(400, gin.H{"message": "error bree"})
 		}
 
-		service.CreateBukuHub(*request)
-		ctx.JSON(200, gin.H{
-			"message": "created",
+		status, massage := service.CreateBukuHub(*request)
+		ctx.JSON(status, gin.H{
+			"message": massage,
 		})
 
 	})
