@@ -72,28 +72,22 @@ func Router(g *gin.RouterGroup, db *sql.DB) {
 		}
 		ctx.JSON(200, buku)
 	})
-	buku.PUT("/:id/:noAnggota", func(ctx *gin.Context) {
-		noAnggota := ctx.Param("noAnggota")
-
-		id, err := strconv.Atoi(ctx.Param("id"))
+	buku.PUT("/:id/register", func(ctx *gin.Context) {
+		id, _ := strconv.Atoi(ctx.Param("id"))
+		var request *CreateRequestBarcode
+		err := ctx.BindJSON(&request)
 		if err != nil {
-			ctx.JSON(400, gin.H{"message": "id tidak valid"})
-			return
-		}
-
-		var request bukuhub.CreateRequest
-		if err := ctx.BindJSON(&request); err != nil {
 			ctx.JSON(400, gin.H{"message": "error update buku & create bukuHub"})
-			fmt.Println("bind error:", err)
+			fmt.Println("errrrrrrroooorororo", err)
 			return
 		}
-
-		if status, err := service.CreateBarcode(request, id, noAnggota); err != nil {
-			ctx.JSON(status, gin.H{"message": "gagal membuat barcode", "error": err.Error()})
+		status, err := service.CreateBarcode(*request, id)
+		if err != nil {
+			fmt.Println(err)
+			ctx.JSON(status, err)
 			return
 		}
-
-		ctx.JSON(200, gin.H{"message": "berhasil update buku & create bukuHub"})
+		ctx.JSON(200, gin.H{"message": "created"})
 	})
 
 }

@@ -1,5 +1,5 @@
 package rak
 
-type CreateRequest struct{
+type CreateRequest struct {
 	NoRak string `json:"no_rak"`
 }

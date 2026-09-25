@@ -7,4 +7,10 @@ type CreateRequest struct {
 	Penulis        string `json:"penulis"`
 }
 
+type CreateRequestBarcode struct{
+	ListKondisiId int `json:"list_kondisi_id"`
+	RakId int `json:"rak_id"`
+	NoAnggota *string `json:"no_anggota"`
+}
+
 
