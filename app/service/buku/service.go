@@ -53,12 +53,10 @@ func (b *bukuService) Get() []ResponseBuku {
 		log.Println(err)
 		return bukuBuku
 	}
-	// log.Println(bukuBukuRepo)
+	
 	for bukuBukuRepo.Next() {
-
 		var buku ResponseBuku
 		if err := bukuBukuRepo.Scan(&buku.Id, &buku.Judul, &buku.ListKategoriId, &buku.Stock, &buku.Penulis); err != nil {
-
 			return bukuBuku
 		}
 		bukuBuku = append(bukuBuku, buku)
@@ -169,3 +167,4 @@ func (b *bukuService) GetMaxBarcode() (string, error) {
 	}
 	return "", fmt.Errorf("error")
 }
+

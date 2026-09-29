@@ -35,8 +35,11 @@ type ResponsePinjamanAnggota struct {
 	Buku        []ResponseBuku `json:"buku"`
 }
 
-type responseGetPinjamanByAnggotaId struct{
+type responseGetPinjamanByAnggotaId struct {
 	AnggotaId int
-	BukuId int
-	MaksBuku int
+	BukuId    int
+	MaksBuku  int
+}
+type responseStock struct {
+	Stock int
 }

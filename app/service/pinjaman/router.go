@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 	"library/app/service/anggota"
+	"library/app/service/buku"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -11,14 +13,14 @@ import (
 func Router(g *gin.RouterGroup, db *sql.DB) {
 	repo := NewRepository(db)
 	repoAnggota := anggota.NewRepository(db)
-	service := NewService(repo, repoAnggota)
+	repoBuku := buku.NewRepository(db)
+	service := NewService(repo, repoAnggota, repoBuku)
 
 	pinjaman := g.Group("/pinjaman")
 
 	pinjaman.GET("/:no_anggota", func(ctx *gin.Context) {
 
 		noAnggota := ctx.Param("no_anggota")
-
 		ctx.JSON(200, service.GetPinjamanByNoAnggota(noAnggota))
 
 	})
@@ -47,6 +49,15 @@ func Router(g *gin.RouterGroup, db *sql.DB) {
 			"message": "created",
 		})
 
+	})
+	pinjaman.GET("/balik/:id", func(ctx *gin.Context) {
+		id, _ := strconv.Atoi(ctx.Param("id"))
+		err := service.UpdateTglBalik(id)
+		if err != nil {
+			ctx.JSON(500, gin.H{"message": "ups"})
+			return
+		}
+		ctx.JSON(200, gin.H{"message": "Updated"})
 	})
 
 	// pinjaman.PUT("/:id", func(ctx *gin.Context) {

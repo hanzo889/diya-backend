@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"library/app/model"
+	"time"
 )
 
 type Repository interface {
@@ -14,6 +15,7 @@ type Repository interface {
 	GetById(id int) *sql.Row
 	GetBukuPinjamanByAnggotaId(id int) *sql.Rows
 	GetPinjamanByAnggotaId(anggotaId int) *sql.Rows
+	UpdateTglBalik(time_ time.Time, id int) error
 }
 
 type repository struct {
@@ -49,7 +51,7 @@ func (r *repository) GetById(id int) *sql.Row {
 	return r.db.QueryRow("select * from pinjaman where id=?", id)
 }
 func (r *repository) GetBukuPinjamanByAnggotaId(id int) *sql.Rows {
-	data, err := r.db.Query("select p.id,b.judul,p.tgl_pinjam from buku as b inner join pinjaman as p on p.buku_id=b.id where p.anggota_id=?", id)
+	data, err := r.db.Query("select p.id,b.judul,p.tgl_pinjam from buku as b inner join pinjaman as p on p.buku_id=b.id where p.anggota_id=? and p.tgl_balik is null", id)
 	fmt.Println(err)
 	return data
 }
@@ -59,3 +61,7 @@ func (r *repository) GetPinjamanByAnggotaId(anggotaId int) *sql.Rows {
 	return data
 }
 
+func (r *repository) UpdateTglBalik(time_ time.Time, id int) error {
+	_, err := r.db.Exec("update pinjaman set tgl_balik=?, status=? where id=?", time_, "dikembalikam", id)
+	return err
+}

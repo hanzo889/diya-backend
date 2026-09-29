@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"library/app/model"
 	"library/app/service/anggota"
+	"library/app/service/buku"
 	"log"
 	"time"
 )
@@ -11,7 +12,7 @@ import (
 type Pinjaman interface {
 	// Get() []ResponsePinjaman
 	CreatePinjaman(pinjamanRequest CreateRequest) error
-	// Update(pinjamanRequest *CreateRequest, id int)
+	UpdateTglBalik(id int) error
 	// Delete(id int)
 	// GetById(id int) *ResponsePinjaman
 	GetPinjamanByNoAnggota(noAnggota string) *ResponsePinjamanAnggota
@@ -21,12 +22,13 @@ type Pinjaman interface {
 type pinjamanService struct {
 	repo        Repository
 	repoAnggota anggota.Repository
+	repoBuku    buku.Repository
 }
 
 var data []model.Pinjaman
 
-func NewService(repo Repository, repoAnggota anggota.Repository) Pinjaman {
-	return &pinjamanService{repo, repoAnggota}
+func NewService(repo Repository, repoAnggota anggota.Repository, repoBuku buku.Repository) Pinjaman {
+	return &pinjamanService{repo, repoAnggota, repoBuku}
 }
 func (b *pinjamanService) GetPinjamanByNoAnggota(noAnggota string) *ResponsePinjamanAnggota {
 	anggotaData := b.repoAnggota.GetAnggotaKlasifikasi(noAnggota)
@@ -57,7 +59,22 @@ func (b *pinjamanService) GetPinjamanByNoAnggota(noAnggota string) *ResponsePinj
 
 func (b *pinjamanService) getPinjaman(anggotaId int, bukuId int) error {
 	var tampungBuku []responseGetPinjamanByAnggotaId
+	var tampungStock []responseStock
+
 	dataPinjaman := b.repo.GetPinjamanByAnggotaId(anggotaId)
+	dataBuku, err := b.repoBuku.GetAll()
+
+	for dataBuku.Next() {
+		var c responseStock
+
+		if err := dataBuku.Scan(&c.Stock); err != nil {
+			return err
+		}
+		tampungStock = append(tampungStock, c)
+	}
+	if len(tampungStock) == 0 {
+		return err
+	}
 	for dataPinjaman.Next() {
 		var p responseGetPinjamanByAnggotaId
 		if err := dataPinjaman.Scan(&p.AnggotaId, &p.BukuId, &p.MaksBuku); err != nil {
@@ -75,6 +92,7 @@ func (b *pinjamanService) getPinjaman(anggotaId int, bukuId int) error {
 			return fmt.Errorf("tidak boleh meminjam buku yang sama")
 		}
 	}
+
 	return nil
 }
 
@@ -102,57 +120,20 @@ func (b *pinjamanService) CreatePinjaman(pinjamanRequest CreateRequest) error {
 	return err
 }
 
-// func (b *pinjamanService) Get() []ResponsePinjaman {
-// 	var pinjamanpinjaman []ResponsePinjaman
-// 	pinjamanpinjamanRepo, err := b.repo.GetAll()
+func (b *pinjamanService) UpdateTglBalik(id int) error {
+	getBuku := b.repo.GetById(id)
 
-// 	if err != nil {
-// 		log.Println(err)
-// 		return pinjamanpinjaman
-// 	}
-// 	// log.Println(pinjamanpinjamanRepo)
-// 	for pinjamanpinjamanRepo.Next() {
+	var c model.Pinjaman
+	if err := getBuku.Scan(&c.Id, &c.AnggotaId, &c.BukuId, &c.TglPinjam, &c.TglBalik, &c.PetugasPinjamId, &c.PetugasBalikId, &c.KondisiAwalId, &c.KondisiAkhirId, &c.Status); err != nil {
+		fmt.Println("####")
+		fmt.Println(err)
+		return err
+	}
+	if c.Id != 0 && c.TglBalik == nil {
+		now := time.Now()
+		err := b.repo.UpdateTglBalik(now, id)
+		return err
+	}
 
-// 		var pinjaman ResponsePinjaman
-// 		if err := pinjamanpinjamanRepo.Scan(&pinjaman.Id, &pinjaman.AnggotaId, &pinjaman.BukuId, &pinjaman.TglPinjam, &pinjaman.TglBalik,&pinjaman.PetugasPinjamId, &pinjaman.PetugasBalikId, &pinjaman.KondisiAwalId, &pinjaman.KondisiAkhirId, &pinjaman.Status); err != nil {
-// 			return pinjamanpinjaman
-// 		}
-// 		pinjamanpinjaman = append(pinjamanpinjaman, pinjaman)
-// 	}
-// 	return pinjamanpinjaman
-// }
-
-// func (b *pinjamanService) Update(pinjamanRequest *CreateRequest, id int) {
-// 	pinjaman := &model.Pinjaman{
-// 		Id:              id,
-// 		AnggotaId:       pinjamanRequest.AnggotaId,
-// 		BukuId:          pinjamanRequest.BukuId,
-// 		TglPinjam:       pinjamanRequest.TglPinjam,
-// 		TglBalik:        pinjamanRequest.TglBalik,
-// 		PetugasPinjamId: pinjamanRequest.PetugasPinjamId,
-// 		PetugasBalikId: pinjamanRequest.PetugasBalikId,
-// 		KondisiAwalId:   pinjamanRequest.KondisiAwalId,
-// 		KondisiAkhirId:  pinjamanRequest.KondisiAkhirId,
-// 		Status:            pinjamanRequest.Status,
-// 	}
-// 	err := b.repo.Update(pinjaman)
-// 	if err != nil {
-// 		log.Println(err)
-// 	}
-// }
-
-// func (b *pinjamanService) Delete(id int) {
-// 	if err := b.repo.Delete(id); err != nil {
-// 		log.Println(err)
-// 	}
-// }
-
-// func (b *pinjamanService) GetById(id int) *ResponsePinjaman {
-// 	barispinjaman := b.repo.GetById(id)
-
-//		var pinjaman ResponsePinjaman
-//		if err := barispinjaman.Scan(&pinjaman.Id, &pinjaman.AnggotaId, &pinjaman.BukuId, &pinjaman.TglPinjam, &pinjaman.TglBalik, &pinjaman.PetugasPinjamId, &pinjaman.PetugasBalikId, &pinjaman.KondisiAwalId, &pinjaman.KondisiAkhirId, &pinjaman.Status); err != nil {
-//			log.Println(err)
-//		}
-//		return &pinjaman
-//	}
+	return fmt.Errorf("Data Tidak Di Temukan")
+}

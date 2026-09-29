@@ -109,3 +109,5 @@ Content-Type: application/json
   "list_kondisi_id":1,
   "rak_id":1,
 }
+###
+GET {{host}}/api/pinjaman/balik/5
