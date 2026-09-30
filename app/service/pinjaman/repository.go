@@ -16,6 +16,7 @@ type Repository interface {
 	GetBukuPinjamanByAnggotaId(id int) *sql.Rows
 	GetPinjamanByAnggotaId(anggotaId int) *sql.Rows
 	UpdateTglBalik(time_ time.Time, id int) error
+	BukuDipinjam(bukuId int) (int, error)
 }
 
 type repository struct {
@@ -64,4 +65,16 @@ func (r *repository) GetPinjamanByAnggotaId(anggotaId int) *sql.Rows {
 func (r *repository) UpdateTglBalik(time_ time.Time, id int) error {
 	_, err := r.db.Exec("update pinjaman set tgl_balik=?, status=? where id=?", time_, "dikembalikam", id)
 	return err
+}
+func (r *repository) BukuDipinjam(bukuId int) (int, error) {
+	jumlah := 0
+	data, err := r.db.Query("select * from pinjaman where buku_id=? and tgl_balik is null", bukuId)
+	if err != nil {
+		return jumlah, err
+	}
+
+	for data.Next() {
+		jumlah += 1
+	}
+	return jumlah, nil
 }

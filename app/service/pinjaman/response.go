@@ -25,6 +25,7 @@ type ResponseBuku struct {
 	Id        int       `json:"id"`
 	Judul     string    `json:"judul"`
 	TglPinjam time.Time `json:"tgl_pinjam"`
+	TglBalik  time.Time	`json:"tgl_balik"`
 }
 
 type ResponsePinjamanAnggota struct {
@@ -41,5 +42,10 @@ type responseGetPinjamanByAnggotaId struct {
 	MaksBuku  int
 }
 type responseStock struct {
+	Id int
+	Judul string
+	ListKategoriId int
 	Stock int
+	Penulis string
+
 }

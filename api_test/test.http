@@ -18,9 +18,8 @@ Content-Type: application/json
 
 {
     
-    "anggota_id":45,
-    "buku_id":18,
-    
+    "anggota_id":55,
+    "buku_id":25,
     "petugas_pinjam_id":null,
     "petugas_balik_id":null,
     "kondisi_awal_id":1,

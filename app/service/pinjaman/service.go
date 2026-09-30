@@ -1,10 +1,12 @@
 package pinjaman
 
 import (
+	"errors"
 	"fmt"
 	"library/app/model"
 	"library/app/service/anggota"
 	"library/app/service/buku"
+	bukuhub "library/app/service/buku_hub"
 	"log"
 	"time"
 )
@@ -23,12 +25,13 @@ type pinjamanService struct {
 	repo        Repository
 	repoAnggota anggota.Repository
 	repoBuku    buku.Repository
+	repoBukuHub bukuhub.Repository
 }
 
 var data []model.Pinjaman
 
-func NewService(repo Repository, repoAnggota anggota.Repository, repoBuku buku.Repository) Pinjaman {
-	return &pinjamanService{repo, repoAnggota, repoBuku}
+func NewService(repo Repository, repoAnggota anggota.Repository, repoBuku buku.Repository, repoBukuHub bukuhub.Repository) Pinjaman {
+	return &pinjamanService{repo, repoAnggota, repoBuku, repoBukuHub}
 }
 func (b *pinjamanService) GetPinjamanByNoAnggota(noAnggota string) *ResponsePinjamanAnggota {
 	anggotaData := b.repoAnggota.GetAnggotaKlasifikasi(noAnggota)
@@ -59,22 +62,9 @@ func (b *pinjamanService) GetPinjamanByNoAnggota(noAnggota string) *ResponsePinj
 
 func (b *pinjamanService) getPinjaman(anggotaId int, bukuId int) error {
 	var tampungBuku []responseGetPinjamanByAnggotaId
-	var tampungStock []responseStock
 
 	dataPinjaman := b.repo.GetPinjamanByAnggotaId(anggotaId)
-	dataBuku, err := b.repoBuku.GetAll()
 
-	for dataBuku.Next() {
-		var c responseStock
-
-		if err := dataBuku.Scan(&c.Stock); err != nil {
-			return err
-		}
-		tampungStock = append(tampungStock, c)
-	}
-	if len(tampungStock) == 0 {
-		return err
-	}
 	for dataPinjaman.Next() {
 		var p responseGetPinjamanByAnggotaId
 		if err := dataPinjaman.Scan(&p.AnggotaId, &p.BukuId, &p.MaksBuku); err != nil {
@@ -98,6 +88,18 @@ func (b *pinjamanService) getPinjaman(anggotaId int, bukuId int) error {
 
 func (b *pinjamanService) CreatePinjaman(pinjamanRequest CreateRequest) error {
 	var err error
+
+	biap, err := b.repo.BukuDipinjam(pinjamanRequest.BukuId)
+	if err != nil {
+		return err
+	}
+	bhs, err := b.repoBukuHub.BukuHubStock(pinjamanRequest.BukuId)
+	if err != nil {
+		return err
+	}
+	if (bhs - biap) <= 0 {
+		return errors.New("Stock Habis")
+	}
 	if err = b.getPinjaman(pinjamanRequest.AnggotaId, pinjamanRequest.BukuId); err == nil {
 		pinjaman := &model.Pinjaman{
 			AnggotaId:       pinjamanRequest.AnggotaId,
@@ -110,13 +112,16 @@ func (b *pinjamanService) CreatePinjaman(pinjamanRequest CreateRequest) error {
 			KondisiAkhirId:  pinjamanRequest.KondisiAkhirId,
 			Status:          pinjamanRequest.Status,
 		}
+
 		err := b.repo.Create(pinjaman)
 		if err != nil {
 			log.Println(err)
 			return err
 		}
+
 		return err
 	}
+
 	return err
 }
 

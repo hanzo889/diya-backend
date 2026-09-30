@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"library/app/service/anggota"
 	"library/app/service/buku"
+	bukuhub "library/app/service/buku_hub"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -14,7 +15,8 @@ func Router(g *gin.RouterGroup, db *sql.DB) {
 	repo := NewRepository(db)
 	repoAnggota := anggota.NewRepository(db)
 	repoBuku := buku.NewRepository(db)
-	service := NewService(repo, repoAnggota, repoBuku)
+	repoBukuHub:=bukuhub.NewRepository(db)
+	service := NewService(repo, repoAnggota, repoBuku,repoBukuHub)
 
 	pinjaman := g.Group("/pinjaman")
 
@@ -44,7 +46,11 @@ func Router(g *gin.RouterGroup, db *sql.DB) {
 			return
 		}
 
-		service.CreatePinjaman(request)
+		err = service.CreatePinjaman(request)
+		if err != nil {
+			ctx.JSON(500, gin.H{"message": "ups"})
+			return
+		}
 		ctx.JSON(200, gin.H{
 			"message": "created",
 		})
