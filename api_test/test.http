@@ -109,4 +109,10 @@ Content-Type: application/json
   "rak_id":1,
 }
 ###
-GET {{host}}/api/pinjaman/balik/5
+PUT {{host}}/api/pinjaman/balik/12
+Content-Type: application/json
+
+{
+    "kondisi_akhir_id":3,
+    "status":"terlambat"
+}

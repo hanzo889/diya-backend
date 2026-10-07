@@ -9,3 +9,7 @@ type CreateRequest struct {
 	KondisiAkhirId  int    `json:"kondisi_akhir_id"`
 	Status          string `json:"status"`
 }
+type UpdateRequest struct {
+	KondisiAkhirId int    `json:"kondisi_akhir_id"`
+	Status         string `json:"status" binding:"oneof=dikembalikan terlambat"`
+}

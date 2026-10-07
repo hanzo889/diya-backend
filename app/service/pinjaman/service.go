@@ -14,7 +14,7 @@ import (
 type Pinjaman interface {
 	// Get() []ResponsePinjaman
 	CreatePinjaman(pinjamanRequest CreateRequest) error
-	UpdateTglBalik(id int) error
+	UpdateTglBalik(updateRequest UpdateRequest, id int) error
 	// Delete(id int)
 	// GetById(id int) *ResponsePinjaman
 	GetPinjamanByNoAnggota(noAnggota string) *ResponsePinjamanAnggota
@@ -125,20 +125,15 @@ func (b *pinjamanService) CreatePinjaman(pinjamanRequest CreateRequest) error {
 	return err
 }
 
-func (b *pinjamanService) UpdateTglBalik(id int) error {
-	getBuku := b.repo.GetById(id)
-
-	var c model.Pinjaman
-	if err := getBuku.Scan(&c.Id, &c.AnggotaId, &c.BukuId, &c.TglPinjam, &c.TglBalik, &c.PetugasPinjamId, &c.PetugasBalikId, &c.KondisiAwalId, &c.KondisiAkhirId, &c.Status); err != nil {
-		fmt.Println("####")
-		fmt.Println(err)
-		return err
-	}
-	if c.Id != 0 && c.TglBalik == nil {
-		now := time.Now()
-		err := b.repo.UpdateTglBalik(now, id)
+func (b *pinjamanService) UpdateTglBalik(updateRequest UpdateRequest, id int) error {
+	now := time.Now()
+	err := b.repo.UpdateTglBalik(now, updateRequest, id)
+	if err != nil {
+		fmt.Println("*****")
+		log.Println(err)
 		return err
 	}
 
-	return fmt.Errorf("Data Tidak Di Temukan")
+	return nil
+
 }

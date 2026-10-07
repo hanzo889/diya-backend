@@ -15,8 +15,8 @@ func Router(g *gin.RouterGroup, db *sql.DB) {
 	repo := NewRepository(db)
 	repoAnggota := anggota.NewRepository(db)
 	repoBuku := buku.NewRepository(db)
-	repoBukuHub:=bukuhub.NewRepository(db)
-	service := NewService(repo, repoAnggota, repoBuku,repoBukuHub)
+	repoBukuHub := bukuhub.NewRepository(db)
+	service := NewService(repo, repoAnggota, repoBuku, repoBukuHub)
 
 	pinjaman := g.Group("/pinjaman")
 
@@ -56,10 +56,20 @@ func Router(g *gin.RouterGroup, db *sql.DB) {
 		})
 
 	})
-	pinjaman.GET("/balik/:id", func(ctx *gin.Context) {
-		id, _ := strconv.Atoi(ctx.Param("id"))
-		err := service.UpdateTglBalik(id)
+	pinjaman.PUT("/balik/:id", func(ctx *gin.Context) {
+		var updateRequest UpdateRequest
+		err := ctx.BindJSON(&updateRequest)
 		if err != nil {
+			fmt.Println(err)
+			ctx.JSON(400, gin.H{"message": "error bree"})
+			return
+		}
+
+		id, _ := strconv.Atoi(ctx.Param("id"))
+		err = service.UpdateTglBalik(updateRequest, id)
+		if err != nil {
+			fmt.Println("#####")
+			fmt.Println(err)
 			ctx.JSON(500, gin.H{"message": "ups"})
 			return
 		}
