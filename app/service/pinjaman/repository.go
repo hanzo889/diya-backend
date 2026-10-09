@@ -58,7 +58,7 @@ func (r *repository) GetBukuPinjamanByAnggotaId(id int) *sql.Rows {
 	return data
 }
 func (r *repository) GetPinjamanByAnggotaId(anggotaId int) *sql.Rows {
-	data, err := r.db.Query("select p.anggota_id, p.buku_id, k.maks_buku from pinjaman as p inner join klasifikasi_anggota_hub as kah on kah.anggota_id=p.anggota_id inner join klasifikasi_anggota as k on k.id=kah.klasifikasi_anggota_id where p.anggota_id=?", anggotaId)
+	data, err := r.db.Query("select p.anggota_id, p.buku_id, k.maks_buku from pinjaman as p inner join klasifikasi_anggota_hub as kah on kah.anggota_id=p.anggota_id inner join klasifikasi_anggota as k on k.id=kah.klasifikasi_anggota_id where p.anggota_id=? and p.tgl_balik is null", anggotaId)
 	fmt.Println(err)
 	return data
 }

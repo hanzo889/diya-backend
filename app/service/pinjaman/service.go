@@ -13,7 +13,7 @@ import (
 
 type Pinjaman interface {
 	// Get() []ResponsePinjaman
-	CreatePinjaman(pinjamanRequest CreateRequest) error
+	CreatePinjaman(pinjamanRequest CreateRequest) (int, error)
 	UpdateTglBalik(updateRequest UpdateRequest, id int) error
 	// Delete(id int)
 	// GetById(id int) *ResponsePinjaman
@@ -72,6 +72,9 @@ func (b *pinjamanService) getPinjaman(anggotaId int, bukuId int) error {
 		}
 		tampungBuku = append(tampungBuku, p)
 	}
+	fmt.Println("#######")
+	fmt.Println(len(tampungBuku))
+	fmt.Println("#######")
 	if len(tampungBuku) == 0 {
 		return nil
 	} else if len(tampungBuku) >= tampungBuku[0].MaksBuku {
@@ -86,19 +89,18 @@ func (b *pinjamanService) getPinjaman(anggotaId int, bukuId int) error {
 	return nil
 }
 
-func (b *pinjamanService) CreatePinjaman(pinjamanRequest CreateRequest) error {
+func (b *pinjamanService) CreatePinjaman(pinjamanRequest CreateRequest) (int, error) {
 	var err error
-
 	biap, err := b.repo.BukuDipinjam(pinjamanRequest.BukuId)
 	if err != nil {
-		return err
+		return 500, err
 	}
 	bhs, err := b.repoBukuHub.BukuHubStock(pinjamanRequest.BukuId)
 	if err != nil {
-		return err
+		return 500, err
 	}
 	if (bhs - biap) <= 0 {
-		return errors.New("Stock Habis")
+		return 400, errors.New("Stock Habis")
 	}
 	if err = b.getPinjaman(pinjamanRequest.AnggotaId, pinjamanRequest.BukuId); err == nil {
 		pinjaman := &model.Pinjaman{
@@ -115,25 +117,19 @@ func (b *pinjamanService) CreatePinjaman(pinjamanRequest CreateRequest) error {
 
 		err := b.repo.Create(pinjaman)
 		if err != nil {
-			log.Println(err)
-			return err
+			return 500, err
 		}
-
-		return err
+		return 201, err
 	}
-
-	return err
+	return 400, errors.New("Buku melebihi batas pinjam")
 }
 
 func (b *pinjamanService) UpdateTglBalik(updateRequest UpdateRequest, id int) error {
 	now := time.Now()
 	err := b.repo.UpdateTglBalik(now, updateRequest, id)
 	if err != nil {
-		fmt.Println("*****")
 		log.Println(err)
 		return err
 	}
-
 	return nil
-
 }

@@ -46,12 +46,16 @@ func Router(g *gin.RouterGroup, db *sql.DB) {
 			return
 		}
 
-		err = service.CreatePinjaman(request)
+		status, err := service.CreatePinjaman(request)
 		if err != nil {
-			ctx.JSON(500, gin.H{"message": "ups"})
+			if status == 500 {
+				ctx.JSON(500, gin.H{"message": "ups"})
+				return
+			}
+			ctx.JSON(status, gin.H{"message": err.Error()})
 			return
 		}
-		ctx.JSON(200, gin.H{
+		ctx.JSON(status, gin.H{
 			"message": "created",
 		})
 
